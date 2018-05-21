@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fff"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.kiddnation254.kiddnation254.HomeActivity"
+    tools:showIn="@layout/app_bar_posts">
+
+    <RelativeLayout
+        android:id="@+id/recycler_view_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#33000000">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="70dp"
+            android:clipToPadding="false"
+            android:padding="5dp"
+            android:scrollbars="vertical" />
+
+        <Button
+            android:id="@+id/showMorePostsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recycler_view"
+            android:layout_marginBottom="70dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="-90dp"
+            android:background="@drawable/button_show_more"
+            android:text="@string/show_more_posts_text"
+            android:textColor="@color/colorPrimary" />
+
+        <Button
+            android:id="@+id/showMoreSearchPostsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recycler_view"
+            android:layout_marginBottom="70dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="-90dp"
+            android:background="@drawable/button_show_more"
+            android:text="@string/show_more_posts_text"
+            android:textColor="@color/colorPrimary"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/no_post"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="200dp"
+        android:background="#fff"
+        android:gravity="center"
+        android:text="@string/no_post"
+        android:textColor="#000"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/fetch_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="200dp"
+        android:background="#fff"
+        android:gravity="center"
+        android:text="@string/error_fetch_post"
+        android:textColor="#000"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+
+</RelativeLayout>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_posts"
+        android:icon="@drawable/baseline_receipt_white_48dp_2x"
+        android:title="@string/posts_text" />
+
+    <item
+        android:id="@+id/navigation_videos"
+        android:icon="@drawable/baseline_video_library_white_48dp_2x"
+        android:title="@string/videos_text" />
+
+    <item
+        android:id="@+id/navigation_quotes"
+        android:icon="@drawable/baseline_comment_white_48dp_2x"
+        android:title="@string/quotes_text" />
+
+</menu>

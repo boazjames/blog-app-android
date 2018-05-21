@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="none">
+        <item
+            android:id="@+id/nav_change_profile_picture"
+            android:icon="@drawable/baseline_add_a_photo_black_24dp"
+            android:title="@string/change_profile_picture" />
+        <item
+            android:id="@+id/nav_view_profile"
+            android:icon="@drawable/ic_account_box_black_24dp"
+            android:title="@string/view_profile" />
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/baseline_power_settings_new_black_24dp"
+            android:title="@string/logout_text" />
+    </group>
+
+    <item android:title="More">
+        <menu>
+            <item
+                android:id="@+id/nav_about"
+                android:icon="@drawable/baseline_help_black_24dp"
+                android:title="@string/about_text" />
+            <item
+                android:id="@+id/nav_exit"
+                android:icon="@drawable/baseline_exit_to_app_black_24dp"
+                android:title="@string/quit" />
+        </menu>
+    </item>
+
+</menu>
