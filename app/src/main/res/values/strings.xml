@@ -167,11 +167,27 @@
         Please give us 5 stars on Play Store if you like this app.
     </string>
     <string name="hint_search">Search...</string>
-    <string name="no_post">Sorry, there is no such post.</string>
-    <string name="error_fetch_post">Sorry, there was an error while fetching the posts.</string>
-    <string name="no_video">Sorry, there is no such video.</string>
-    <string name="error_fetch_video">Sorry, there was an error while fetching the videos.</string>
-    <string name="error_fetch_single_post">Sorry, there was an error while fetching the post.</string>
-    <string name="error_fetch_quote">Sorry, there was an error while fetching the Today\'s Quote.</string>
+    <string name="no_post">Sorry, there is no such post.\n
+        Try a different search term.</string>
+    <string name="error_fetch_post">
+        Sorry, there was an error while fetching the posts.\n
+        Please check your internet connection.
+    </string>
+    <string name="no_video">
+        Sorry, there is no such video.\n
+        Try a different search term.
+    </string>
+    <string name="error_fetch_video">
+        Sorry, there was an error while fetching the videos.\n
+        Please check your internet connection.
+    </string>
+    <string name="error_fetch_single_post">
+        Sorry, there was an error while fetching the post.\n
+        Please check your internet connection.
+    </string>
+    <string name="error_fetch_quote">
+        Sorry, there was an error while fetching the Today\'s Quote.\n
+        Please check your internet connection.
+    </string>
     <string name="version">Version: 1.0</string>
 </resources>

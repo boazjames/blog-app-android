@@ -129,7 +129,7 @@ public class HomeActivity extends AppCompatActivity
         textViewUsername.setText(SharedPrefManager.getInstance(getApplicationContext()).getUsername());
 
         userImgLink = SharedPrefManager.getInstance(getApplicationContext()).getUserImageLink();
-        path = "http://192.168.43.167/kidd_nation/user_images/";
+        path = Constants.URL_USER_IMG;
 
 
         showMorePostsButton.setOnClickListener(

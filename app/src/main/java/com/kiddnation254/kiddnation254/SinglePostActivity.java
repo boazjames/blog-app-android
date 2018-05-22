@@ -167,8 +167,8 @@ public class SinglePostActivity extends AppCompatActivity {
 
                                 Picasso.with(getApplicationContext())
                                         .load(post.getThumbnail())
-                                        .placeholder(R.drawable.ic_account_box_black_24dp)
-                                        .error(R.drawable.ic_account_box_black_24dp)
+                                        .placeholder(R.drawable.blog_placeholder)
+                                        .error(R.drawable.blog_placeholder)
                                         .into(postImg);
 
                                 relativeLayoutContainer.setVisibility(View.VISIBLE);

@@ -115,7 +115,7 @@ public class VideosActivity extends AppCompatActivity
         textViewUsername.setText(SharedPrefManager.getInstance(getApplicationContext()).getUsername());
 
         userImgLink = SharedPrefManager.getInstance(getApplicationContext()).getUserImageLink();
-        path = "http://192.168.43.167/kidd_nation/user_images/";
+        path = Constants.URL_USER_IMG;
 
         showMoreVideosButton.setOnClickListener(
                 new View.OnClickListener() {
@@ -258,7 +258,7 @@ public class VideosActivity extends AppCompatActivity
             AlertDialog alertDialog = alertDialogBuilder.create();
             alertDialog.show();
         } else if (id == R.id.nav_about) {
-
+            startActivity(new Intent(getApplicationContext(), AboutActivity.class));
         } else if (id == R.id.nav_exit) {
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
             alertDialogBuilder.setTitle("Exit App?");

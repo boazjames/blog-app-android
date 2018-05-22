@@ -118,7 +118,7 @@ public class ChangePhotoActivity extends AppCompatActivity implements EasyPermis
 
 
         userId = Integer.toString(SharedPrefManager.getInstance(getApplicationContext()).getUserId());
-        path = "http://192.168.43.167/kidd_nation/user_images/";
+        path = Constants.URL_USER_IMG;
     }
 
     @Override

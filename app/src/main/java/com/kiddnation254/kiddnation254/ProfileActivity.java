@@ -47,7 +47,7 @@ public class ProfileActivity extends AppCompatActivity {
         userEmail = SharedPrefManager.getInstance(getApplicationContext()).getUserEmail();
         userPhone = SharedPrefManager.getInstance(getApplicationContext()).getUserPhone();
         username = SharedPrefManager.getInstance(getApplicationContext()).getUsername();
-        path = "http://192.168.43.167/kidd_nation/user_images/";
+        path = Constants.URL_USER_IMG;
 
         profileUsername.setText(username);
         profileEmail.setText(userEmail);
