@@ -17,10 +17,10 @@
         app:civ_border_width="2dp" />
     <RelativeLayout
         android:id="@+id/relativeLayout1"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="100dp"
         android:layout_below="@+id/profilePhoto"
-        android:gravity="center_horizontal"
         android:layout_marginBottom="20dp">
         <TextView
             android:id="@+id/usernameLabel"
@@ -43,10 +43,10 @@
 
     <RelativeLayout
         android:id="@+id/relativeLayout2"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/relativeLayout1"
-        android:gravity="center_horizontal"
+        android:layout_marginLeft="100dp"
         android:layout_marginBottom="20dp">
         <TextView
             android:id="@+id/emailLabel"
@@ -69,10 +69,10 @@
 
     <RelativeLayout
         android:id="@+id/relativeLayout3"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/relativeLayout2"
-        android:gravity="center_horizontal"
+        android:layout_marginLeft="100dp"
         android:layout_marginBottom="20dp">
         <TextView
             android:id="@+id/phoneLabel"

@@ -7,7 +7,7 @@
         android:id="@+id/relativeLayoutContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#33000000">
+        android:background="@drawable/bg_wood">
 
         <TextView
             android:id="@+id/quotesHeading"

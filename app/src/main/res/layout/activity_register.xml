@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#6195FF"
+    android:background="@drawable/bg_wood"
     android:padding="25dp"
     tools:context="com.kiddnation254.kiddnation254.RegisterActivity">
 
@@ -16,9 +16,9 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/userImage"
         android:layout_marginTop="17dp"
-        android:background="#fff"
-        android:drawableLeft="@drawable/ic_account_box_black_24dp"
-        android:drawableStart="@drawable/ic_account_box_black_24dp"
+        android:background="@drawable/input"
+        android:drawableLeft="@drawable/baseline_account_box_white_24dp"
+        android:drawableStart="@drawable/baseline_account_box_white_24dp"
         android:ems="10"
         android:hint="@string/username_hint"
         android:inputType="textPersonName"
@@ -28,7 +28,10 @@
         android:paddingTop="5dp"
         android:textColorLink="#000"
         android:textCursorDrawable="@null"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:textColor="#fff"
+        android:textColorHint="#fff"
+        android:drawableTint="#fff"/>
 
     <EditText
         android:id="@+id/email"
@@ -38,9 +41,9 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/username"
         android:layout_marginTop="14dp"
-        android:background="#fff"
-        android:drawableLeft="@drawable/ic_email_black_24dp"
-        android:drawableStart="@drawable/ic_email_black_24dp"
+        android:background="@drawable/input"
+        android:drawableLeft="@drawable/baseline_email_white_24dp"
+        android:drawableStart="@drawable/baseline_email_white_24dp"
         android:ems="10"
         android:hint="@string/email_hint"
         android:inputType="textEmailAddress"
@@ -50,7 +53,10 @@
         android:paddingTop="5dp"
         android:textColorLink="#000"
         android:textCursorDrawable="@null"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:textColor="#fff"
+        android:textColorHint="#fff"
+        android:drawableTint="#fff"/>
 
     <EditText
         android:id="@+id/phone"
@@ -60,9 +66,9 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/email"
         android:layout_marginTop="15dp"
-        android:background="#fff"
-        android:drawableLeft="@drawable/ic_call_black_24dp"
-        android:drawableStart="@drawable/ic_call_black_24dp"
+        android:background="@drawable/input"
+        android:drawableLeft="@drawable/baseline_call_white_24dp"
+        android:drawableStart="@drawable/baseline_call_white_24dp"
         android:ems="10"
         android:hint="@string/phone_hint"
         android:inputType="phone"
@@ -72,7 +78,10 @@
         android:paddingTop="5dp"
         android:textColorLink="#000"
         android:textCursorDrawable="@null"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:textColor="#fff"
+        android:textColorHint="#fff"
+        android:drawableTint="#fff"/>
 
 
     <EditText
@@ -83,9 +92,9 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/phone"
         android:layout_marginTop="13dp"
-        android:background="#fff"
-        android:drawableLeft="@drawable/ic_lock_black_24dp"
-        android:drawableStart="@drawable/ic_lock_black_24dp"
+        android:background="@drawable/input"
+        android:drawableLeft="@drawable/baseline_lock_white_24dp"
+        android:drawableStart="@drawable/baseline_lock_white_24dp"
         android:ems="10"
         android:hint="@string/password_hint"
         android:inputType="textPassword"
@@ -94,7 +103,10 @@
         android:paddingRight="10dp"
         android:paddingTop="5dp"
         android:textCursorDrawable="@null"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:textColor="#fff"
+        android:textColorHint="#fff"
+        android:drawableTint="#fff"/>
 
     <EditText
         android:id="@+id/confirmPassword"
@@ -104,9 +116,9 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/password"
         android:layout_marginTop="12dp"
-        android:background="#fff"
-        android:drawableLeft="@drawable/ic_lock_black_24dp"
-        android:drawableStart="@drawable/ic_lock_black_24dp"
+        android:background="@drawable/input"
+        android:drawableLeft="@drawable/baseline_lock_white_24dp"
+        android:drawableStart="@drawable/baseline_lock_white_24dp"
         android:ems="10"
         android:hint="@string/confirm_password_hint"
         android:inputType="textPassword"
@@ -115,7 +127,10 @@
         android:paddingRight="10dp"
         android:paddingTop="5dp"
         android:textCursorDrawable="@null"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:textColor="#fff"
+        android:textColorHint="#fff"
+        android:drawableTint="#fff"/>
 
     <Button
         android:id="@+id/buttonRegister"
@@ -127,7 +142,9 @@
         android:layout_marginTop="14dp"
         android:gravity="center"
         android:text="@string/register_text"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:textColor="#fff"
+        android:background="@drawable/button"/>
 
     <TextView
         android:id="@+id/goToLogin"
