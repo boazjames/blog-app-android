@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -71,10 +72,8 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.MyViewHolder
         );
 
         // loading album cover using Glide library
-        Picasso.with(mContext)
+        Glide.with(mContext)
                 .load(post.getThumbnail())
-                .placeholder(R.drawable.blog_placeholder)
-                .error(R.drawable.blog_placeholder)
                 .into(holder.thumbnail);
 
     }
