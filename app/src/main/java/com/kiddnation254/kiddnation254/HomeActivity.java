@@ -55,7 +55,7 @@ public class HomeActivity extends AppCompatActivity
 
     private ImageView imageViewUser;
     private TextView textViewUsername, textViewNoPost, textViewFetchError;
-    private String path;
+    private String path, postImgPath;
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private PostsAdapter adapter;
@@ -380,7 +380,7 @@ public class HomeActivity extends AppCompatActivity
 
                                             Post post = new Post(row.getInt("id"), row.getString("title"),
                                                     limitStringLength(row.getString("body"), 200),
-                                                    "http://192.168.43.167/kidd_nation/post_images/" +
+                                                    Constants.URL_POST_IMG +
                                                             row.getString("post_image"),
                                                     row.getString("author"), showDate(row.getString("time")));
                                             postList.add(post);
@@ -461,7 +461,7 @@ public class HomeActivity extends AppCompatActivity
 
                                         Post post = new Post(row.getInt("id"), row.getString("title"),
                                                 limitStringLength(row.getString("body"), 200),
-                                                "http://192.168.43.167/kidd_nation/post_images/" +
+                                                Constants.URL_POST_IMG +
                                                         row.getString("post_image"),
                                                 row.getString("author"), showDate(row.getString("time")));
                                         postListNew.add(post);
@@ -561,7 +561,7 @@ public class HomeActivity extends AppCompatActivity
 
                                             Post post = new Post(row.getInt("id"), row.getString("title"),
                                                     limitStringLength(row.getString("body"), 200),
-                                                    "http://192.168.43.167/kidd_nation/post_images/" +
+                                                    Constants.URL_POST_IMG +
                                                             row.getString("post_image"),
                                                     row.getString("author"), showDate(row.getString("time")));
                                             postList.add(post);
@@ -644,7 +644,7 @@ public class HomeActivity extends AppCompatActivity
 
                                         Post post = new Post(row.getInt("id"), row.getString("title"),
                                                 limitStringLength(row.getString("body"), 200),
-                                                "http://192.168.43.167/kidd_nation/post_images/" +
+                                                Constants.URL_POST_IMG +
                                                         row.getString("post_image"),
                                                 row.getString("author"), showDate(row.getString("time")));
                                         postListNew.add(post);

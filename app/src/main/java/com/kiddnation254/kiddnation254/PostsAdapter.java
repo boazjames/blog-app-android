@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -71,8 +72,13 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.MyViewHolder
                 }
         );
 
+        RequestOptions requestOptions = new RequestOptions();
+        requestOptions.placeholder(R.drawable.blog_placeholder);
+        requestOptions.error(R.drawable.blog_placeholder);
+
         // loading album cover using Glide library
         Glide.with(mContext)
+                .setDefaultRequestOptions(requestOptions)
                 .load(post.getThumbnail())
                 .into(holder.thumbnail);
 

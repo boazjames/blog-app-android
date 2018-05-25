@@ -156,7 +156,7 @@ public class SinglePostActivity extends AppCompatActivity {
                             if (!jsonObject.getBoolean("error")) {
 
                                 Post post = new Post(jsonObject.getInt("id"), jsonObject.getString("title"), jsonObject.getString("body"),
-                                        "http://192.168.43.167/kidd_nation/post_images/" + jsonObject.getString("post_image"),
+                                        Constants.URL_POST_IMG + jsonObject.getString("post_image"),
                                         jsonObject.getString("author"), showDate(jsonObject.getString("time")));
 
                                 author.setText(post.getAuthor());
