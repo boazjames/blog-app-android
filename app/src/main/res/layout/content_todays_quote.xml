@@ -7,7 +7,7 @@
         android:id="@+id/relativeLayoutContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/bg_wood">
+        android:background="@color/seafoam">
 
         <TextView
             android:id="@+id/quotesHeading"
@@ -17,7 +17,7 @@
             android:layout_marginTop="20dp"
             android:gravity="center_horizontal"
             android:text="@string/quotes_heading"
-            android:textColor="@color/bg_screen1"
+            android:textColor="@color/deep_aqua"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -37,8 +37,9 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="10dp"
+                android:fontFamily="cursive"
                 android:text="body"
-                android:textColor="@color/bg_screen1"
+                android:textColor="#FFF"
                 android:textSize="18sp"
                 android:textStyle="italic" />
 
@@ -47,9 +48,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/quoteBody"
+                android:fontFamily="cursive"
                 android:gravity="right"
                 android:text="author"
-                android:textColor="@color/bg_screen1" />
+                android:textColor="#FFF" />
         </RelativeLayout>
     </RelativeLayout>
 

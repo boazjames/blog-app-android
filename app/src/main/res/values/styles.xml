@@ -31,7 +31,7 @@
         <!-- This will change drawer icon -->
         <item name="drawerArrowStyle">@style/WhiteDrawerIconStyle</item>
         <!-- background of the  -->
-        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:background">@color/ocean</item>
     </style>
 
 

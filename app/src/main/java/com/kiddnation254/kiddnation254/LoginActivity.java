@@ -26,8 +26,6 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText editTextUsername;
     private EditText editTextPassword;
-    private Button buttonLogin;
-    private TextView textViewGoToRegister;
     private ProgressDialog progressDialog;
 
     @Override
@@ -43,9 +41,10 @@ public class LoginActivity extends AppCompatActivity {
 
         editTextUsername = (EditText) findViewById(R.id.username);
         editTextPassword = (EditText) findViewById(R.id.password);
-        buttonLogin = (Button) findViewById(R.id.buttonRegister);
-        textViewGoToRegister = (TextView) findViewById(R.id.goToRegister);
+        Button buttonLogin = (Button) findViewById(R.id.buttonLogin);
+        TextView textViewGoToRegister = (TextView) findViewById(R.id.goToRegister);
         progressDialog = new ProgressDialog(this);
+        TextView resetTextView = (TextView) findViewById(R.id.resetTextView);
 
 
         buttonLogin.setOnClickListener(
@@ -62,6 +61,15 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         launchRegister();
+                    }
+                }
+        );
+
+        resetTextView.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startActivity(new Intent(getApplicationContext(), SendCodeActivity.class));
                     }
                 }
         );
@@ -108,7 +116,8 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         progressDialog.hide();
-                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG);
+                        Toast.makeText(getApplicationContext(),
+                                "Network error please try again.", Toast.LENGTH_LONG).show();
                     }
                 }
         ){

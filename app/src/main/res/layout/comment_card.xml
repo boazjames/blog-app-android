@@ -4,13 +4,14 @@
     android:id="@+id/card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="0dp"
-    android:background="@drawable/card">
+    android:layout_margin="0dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="5dp">
+        android:padding="5dp"
+        android:background="@drawable/comment_card"
+        android:layout_margin="0dp">
 
         <ImageView
             android:id="@+id/userImg"
@@ -31,7 +32,7 @@
             android:layout_toEndOf="@+id/userImg"
             android:layout_toRightOf="@+id/userImg"
             android:text="username"
-            android:textColor="#000"
+            android:textColor="@color/deep_aqua"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -45,7 +46,8 @@
             android:layout_toEndOf="@+id/username"
             android:layout_toRightOf="@+id/username"
             android:textSize="10sp"
-            android:text="4 months ago" />
+            android:text="4 months ago"
+            android:textColor="@color/deep_aqua"/>
 
         <TextView
             android:id="@+id/commentBody"

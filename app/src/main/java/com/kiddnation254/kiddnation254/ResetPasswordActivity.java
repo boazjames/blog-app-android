@@ -2,12 +2,14 @@ package com.kiddnation254.kiddnation254;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -22,64 +24,77 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RegisterActivity extends AppCompatActivity {
+public class ResetPasswordActivity extends AppCompatActivity {
 
-    private EditText editTextUsername, editTextEmail, editTextPhone, editTextPassword, editTextConfirmPassword;
     private ProgressDialog progressDialog;
+    private EditText editTextPassword;
+    private EditText editTextConfirm_password;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register);
+        setContentView(R.layout.activity_reset_password);
 
-        if(SharedPrefManager.getInstance(this).isLoggedIn()){
-            finish();
-            startActivity(new Intent(this, HomeActivity.class));
+        Bundle extras = getIntent().getExtras();
+        if (extras == null) {
             return;
         }
-
-        editTextUsername = (EditText) findViewById(R.id.username);
-        editTextEmail = (EditText) findViewById(R.id.email);
-        editTextPhone = (EditText) findViewById(R.id.phone);
+        final String email = extras.getString("email");
+        Button buttonReset = (Button) findViewById(R.id.buttonReset);
         editTextPassword = (EditText) findViewById(R.id.password);
-        editTextConfirmPassword = (EditText) findViewById(R.id.confirmPassword) ;
-        Button buttonRegister = (Button) findViewById(R.id.buttonRegister);
-
-        TextView textViewGoToLogin = (TextView) findViewById(R.id.goToLogin);
+        editTextConfirm_password = (EditText) findViewById(R.id.confirmPassword);
 
         progressDialog = new ProgressDialog(this);
 
-        textViewGoToLogin.setOnClickListener(
-                new TextView.OnClickListener() {
-                    public void onClick(View v) {
-                        goToLogin();
-                    }
-                }
-        );
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Reset Password");
 
-        buttonRegister.setOnClickListener(
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        buttonReset.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        registerUser();
+                        String password = editTextPassword.getText().toString().trim();
+                        String confirm_password = editTextConfirm_password.getText().toString().trim();
+                        if (password.length() < 8) {
+                            Toast.makeText(getApplicationContext(),
+                                    "Password length must be at least 8 characters",
+                                    Toast.LENGTH_LONG).show();
+
+                        } else if (!password.equals(confirm_password)) {
+                            Toast.makeText(getApplicationContext(), "Password does not match",
+                                    Toast.LENGTH_LONG).show();
+                        } else {
+                            resetPassword(password, email);
+                        }
                     }
                 }
         );
     }
 
-    public void registerUser(){
-        final String username = editTextUsername.getText().toString().trim();
-        final String email = editTextEmail.getText().toString().trim();
-        final String phone = editTextPhone.getText().toString().trim();
-        final String password = editTextPassword.getText().toString().trim();
-        final String confirmPassword = editTextConfirmPassword.getText().toString().trim();
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // todo: goto back activity from here
 
-        progressDialog.setMessage("registering user");
+                onBackPressed();
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void resetPassword(final String password, final String email) {
+        progressDialog.setMessage("Resetting password");
         progressDialog.show();
 
         StringRequest stringRequest = new StringRequest(
                 Request.Method.POST,
-                Constants.URL_REGISTER,
+                Constants.URL_RESET_PASSWORD,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -87,13 +102,12 @@ public class RegisterActivity extends AppCompatActivity {
 
                         try {
                             JSONObject jsonObject = new JSONObject(response);
-                            if(!jsonObject.getBoolean("error")){
+                            if (!jsonObject.getBoolean("error")) {
                                 Toast.makeText(getApplicationContext(), jsonObject.getString("message"),
                                         Toast.LENGTH_LONG).show();
-                                Intent intent = new Intent(getApplicationContext(), VerifyActivity.class);
-                                intent.putExtra("email", jsonObject.getString("email"));
+                                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                                 startActivity(intent);
-                            }else {
+                            } else {
                                 Toast.makeText(getApplicationContext(), jsonObject.getString("message"), Toast.LENGTH_LONG).show();
                             }
                         } catch (JSONException e) {
@@ -110,30 +124,16 @@ public class RegisterActivity extends AppCompatActivity {
                                 "Network error please try again.", Toast.LENGTH_LONG).show();
                     }
                 }
-        ){
+        ) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
-                params.put("username", username);
-                params.put("email", email);
-                params.put("phone", phone);
                 params.put("password", password);
-                params.put("confirm_password", confirmPassword);
+                params.put("email", email);
                 return params;
             }
         };
 
         RequestHandler.getInstance(this).addToRequestQueue(stringRequest);
-
     }
-
-    public void goToVerify(){
-        startActivity(new Intent(this, VerifyActivity.class));
-        finish();
-    }
-    public void goToLogin(){
-        startActivity(new Intent(this, LoginActivity.class));
-        finish();
-    }
-
 }

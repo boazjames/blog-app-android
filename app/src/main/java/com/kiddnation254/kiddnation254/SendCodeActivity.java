@@ -2,12 +2,13 @@ package com.kiddnation254.kiddnation254;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -22,64 +23,59 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RegisterActivity extends AppCompatActivity {
+public class SendCodeActivity extends AppCompatActivity {
 
-    private EditText editTextUsername, editTextEmail, editTextPhone, editTextPassword, editTextConfirmPassword;
+    private EditText editTextEmail;
     private ProgressDialog progressDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register);
+        setContentView(R.layout.activity_send_code);
 
-        if(SharedPrefManager.getInstance(this).isLoggedIn()){
-            finish();
-            startActivity(new Intent(this, HomeActivity.class));
-            return;
-        }
-
-        editTextUsername = (EditText) findViewById(R.id.username);
         editTextEmail = (EditText) findViewById(R.id.email);
-        editTextPhone = (EditText) findViewById(R.id.phone);
-        editTextPassword = (EditText) findViewById(R.id.password);
-        editTextConfirmPassword = (EditText) findViewById(R.id.confirmPassword) ;
-        Button buttonRegister = (Button) findViewById(R.id.buttonRegister);
-
-        TextView textViewGoToLogin = (TextView) findViewById(R.id.goToLogin);
+        Button buttonSendCode = (Button) findViewById(R.id.buttonSendCode);
 
         progressDialog = new ProgressDialog(this);
 
-        textViewGoToLogin.setOnClickListener(
-                new TextView.OnClickListener() {
-                    public void onClick(View v) {
-                        goToLogin();
-                    }
-                }
-        );
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Reset Password");
 
-        buttonRegister.setOnClickListener(
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        buttonSendCode.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        registerUser();
+                        String email = editTextEmail.getText().toString().trim();
+                        sendCode(email);
                     }
                 }
         );
     }
 
-    public void registerUser(){
-        final String username = editTextUsername.getText().toString().trim();
-        final String email = editTextEmail.getText().toString().trim();
-        final String phone = editTextPhone.getText().toString().trim();
-        final String password = editTextPassword.getText().toString().trim();
-        final String confirmPassword = editTextConfirmPassword.getText().toString().trim();
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // todo: goto back activity from here
 
-        progressDialog.setMessage("registering user");
+                onBackPressed();
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void sendCode(final String email) {
+        progressDialog.setMessage("Sending Password Reset Code");
         progressDialog.show();
 
         StringRequest stringRequest = new StringRequest(
                 Request.Method.POST,
-                Constants.URL_REGISTER,
+                Constants.URL_SEND_CODE,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -87,13 +83,13 @@ public class RegisterActivity extends AppCompatActivity {
 
                         try {
                             JSONObject jsonObject = new JSONObject(response);
-                            if(!jsonObject.getBoolean("error")){
+                            if (!jsonObject.getBoolean("error")) {
                                 Toast.makeText(getApplicationContext(), jsonObject.getString("message"),
                                         Toast.LENGTH_LONG).show();
-                                Intent intent = new Intent(getApplicationContext(), VerifyActivity.class);
+                                Intent intent = new Intent(getApplicationContext(), VerifyResetCodeActivity.class);
                                 intent.putExtra("email", jsonObject.getString("email"));
                                 startActivity(intent);
-                            }else {
+                            } else {
                                 Toast.makeText(getApplicationContext(), jsonObject.getString("message"), Toast.LENGTH_LONG).show();
                             }
                         } catch (JSONException e) {
@@ -110,30 +106,15 @@ public class RegisterActivity extends AppCompatActivity {
                                 "Network error please try again.", Toast.LENGTH_LONG).show();
                     }
                 }
-        ){
+        ) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
-                params.put("username", username);
                 params.put("email", email);
-                params.put("phone", phone);
-                params.put("password", password);
-                params.put("confirm_password", confirmPassword);
                 return params;
             }
         };
 
         RequestHandler.getInstance(this).addToRequestQueue(stringRequest);
-
     }
-
-    public void goToVerify(){
-        startActivity(new Intent(this, VerifyActivity.class));
-        finish();
-    }
-    public void goToLogin(){
-        startActivity(new Intent(this, LoginActivity.class));
-        finish();
-    }
-
 }

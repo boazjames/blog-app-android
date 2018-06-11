@@ -1,6 +1,8 @@
 package com.kiddnation254.kiddnation254;
+
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -45,10 +47,12 @@ public class SingleVideoActivity extends YouTubeBaseActivity implements AppCompa
         delegate.setContentView(R.layout.activity_single_video);
 
         //Finally, let's add the Toolbar
-        Toolbar toolbar= (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         delegate.setSupportActionBar(toolbar);
         delegate.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         delegate.getSupportActionBar().setTitle(videoTitle);
+        delegate.getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources()
+                .getColor(R.color.deep_aqua)));
 
         final Drawable upArrow = getResources().getDrawable(R.drawable.baseline_arrow_back_white_24dp);
         upArrow.setColorFilter(Color.parseColor("#FFFFFF"), PorterDuff.Mode.SRC_ATOP);

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_wood"
+    android:background="@color/seafoam"
     android:padding="25dp"
     tools:context="com.kiddnation254.kiddnation254.LoginActivity">
 
@@ -22,16 +22,17 @@
         android:ems="10"
         android:hint="@string/username_hint"
         android:inputType="textPersonName"
-        android:paddingBottom="5dp"
+        android:paddingBottom="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:paddingTop="5dp"
+        android:paddingTop="10dp"
         android:textColorLink="#000"
         android:textCursorDrawable="@null"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:textColor="#fff"
         android:textColorHint="#fff"
-        android:drawableTint="#fff"/>
+        android:drawablePadding="5dp"
+        android:fontFamily="serif-monospace"/>
 
 
     <EditText
@@ -48,18 +49,19 @@
         android:ems="10"
         android:hint="@string/password_hint"
         android:inputType="textPassword"
-        android:paddingBottom="5dp"
+        android:paddingBottom="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:paddingTop="5dp"
+        android:paddingTop="10dp"
         android:textCursorDrawable="@null"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:textColor="#fff"
         android:textColorHint="#fff"
-        android:drawableTint="#fff"/>
+        android:drawablePadding="5dp"
+        android:fontFamily="serif-monospace"/>
 
     <Button
-        android:id="@+id/buttonRegister"
+        android:id="@+id/buttonLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/password"
@@ -70,18 +72,6 @@
         android:textSize="14sp"
         android:background="@drawable/button"/>
 
-    <TextView
-        android:id="@+id/goToRegister"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/buttonRegister"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="27dp"
-        android:gravity="center_horizontal"
-        android:text="@string/not_registered_text"
-        android:textColor="#00f"
-        android:textSize="14sp" />
-
     <ImageView
         android:id="@+id/userImage"
         android:layout_width="150dp"
@@ -90,5 +80,62 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="25dp"
         android:src="@drawable/app_logo_transparent" />
+
+    <RelativeLayout
+        android:id="@+id/wrapper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/buttonLogin"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true">
+        <TextView
+            android:id="@+id/forgotPwdTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/forgot_password"
+            android:textColor="#000"
+            android:textSize="16sp"
+            />
+
+        <TextView
+            android:id="@+id/resetTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/forgotPwdTxt"
+            android:text="@string/reset"
+            android:layout_toRightOf="@+id/forgotPwdTxt"
+            android:textSize="16sp"
+            android:textColor="@color/ocean"
+            android:layout_marginLeft="5dp"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/registerWrapper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/wrapper"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true">
+        <TextView
+            android:id="@+id/registerText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/not_registered"
+            android:textColor="#000"
+            android:textSize="16sp"
+            />
+
+        <TextView
+            android:id="@+id/goToRegister"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/registerText"
+            android:text="@string/register"
+            android:layout_toRightOf="@+id/registerText"
+            android:textSize="16sp"
+            android:textColor="@color/ocean"
+            android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp" />
+    </RelativeLayout>
 
 </RelativeLayout>

@@ -10,7 +10,7 @@
         android:id="@+id/recycler_view_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#33000000">
+        android:background="@color/seafoam">
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view_videos"
         android:layout_width="match_parent"

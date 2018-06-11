@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#fff"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.kiddnation254.kiddnation254.HomeActivity"
     tools:showIn="@layout/app_bar_posts">
@@ -13,7 +12,7 @@
         android:id="@+id/recycler_view_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#33000000">
+        android:background="@color/seafoam">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view"
@@ -64,7 +63,7 @@
         android:textColor="#000"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:visibility="gone" />
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/fetch_error"
@@ -77,7 +76,7 @@
         android:textColor="#000"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:visibility="gone" />
+        android:visibility="gone"/>
 
 
 </RelativeLayout>

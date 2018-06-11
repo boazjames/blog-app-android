@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".VerifyActivity"
+    android:padding="20dp">
+    <TextView
+        android:id="@+id/textViewActivation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/activation_txt"
+        android:layout_marginTop="20dp"
+        android:textColor="#000"
+        android:textSize="16sp"
+        android:gravity="center_horizontal"/>
+
+    <com.jkb.vcedittext.VerificationCodeEditText
+        android:id="@+id/editTextCode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:layout_below="@+id/textViewActivation"
+        android:layout_marginTop="20dp"
+        android:textStyle="bold"
+        android:textColor="@color/ocean"
+        android:textSize="40sp"
+        app:bottomLineHeight="5dp"
+        app:bottomLineNormalColor="@color/deep_aqua"
+        app:bottomLineSelectedColor="@color/deep_aqua"
+        app:figures="5"
+        app:selectedBackgroundColor="@color/seafoam"
+        app:verCodeMargin="10dp" />
+
+    <Button
+        android:id="@+id/buttonVerify"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editTextCode"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="@string/activate"
+        android:textColor="#fff"
+        android:background="@drawable/button"/>
+</RelativeLayout>

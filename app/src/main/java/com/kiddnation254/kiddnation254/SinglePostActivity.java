@@ -3,6 +3,7 @@ package com.kiddnation254.kiddnation254;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -161,7 +163,12 @@ public class SinglePostActivity extends AppCompatActivity {
 
                                 author.setText(post.getAuthor());
                                 postedAt.setText(post.getTime());
-                                postBody.setText(trimString(post.getBody()));
+//                                postBody.setText(trimString(post.getBody()));
+                                if (Build.VERSION.SDK_INT >= 26) {
+                                    postBody.setText(Html.fromHtml(trimString(post.getBody()), Html.FROM_HTML_MODE_COMPACT));
+                                } else {
+                                    postBody.setText(Html.fromHtml(trimString(post.getBody())));
+                                }
                                 postTitle.setText(post.getTitle());
                                 getSupportActionBar().setTitle(post.getTitle());
 
@@ -169,6 +176,7 @@ public class SinglePostActivity extends AppCompatActivity {
                                         .load(post.getThumbnail())
                                         .placeholder(R.drawable.blog_placeholder)
                                         .error(R.drawable.blog_placeholder)
+                                        .fit()
                                         .into(postImg);
 
                                 relativeLayoutContainer.setVisibility(View.VISIBLE);
@@ -413,7 +421,7 @@ public class SinglePostActivity extends AppCompatActivity {
         return TimeAgo.using(timeInMilliseconds);
     }
 
-    private String trimString(String value){
+    private String trimString(String value) {
         String[] regx = {"<p>", "</p>", "<b>", "</b>", "<h4>", "</h4>"};
         for (int i = 0; i < regx.length; i++) {
             String regX = regx[i];

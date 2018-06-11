@@ -20,7 +20,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:text="TextView"
-        android:textColor="#000"
+        android:textColor="@color/ocean"
         android:textSize="14sp"
         android:textStyle="bold"/>
 

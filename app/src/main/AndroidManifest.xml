@@ -14,7 +14,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".WelcomeActivity"
+        <activity
+            android:name=".WelcomeActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,29 +23,47 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity"
+        <activity
+            android:name=".LoginActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".RegisterActivity"
+        <activity
+            android:name=".RegisterActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".SinglePostActivity"
+        <activity
+            android:name=".SinglePostActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".HomeActivity"
             android:label="@string/title_activity_navigation"
-            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".VideosActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".VideosActivity"
+        <activity
+            android:name=".SingleVideoActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".SingleVideoActivity"
+        <activity
+            android:name=".TodaysQuoteActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".TodaysQuoteActivity"
+        <activity
+            android:name=".ProfileActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".ProfileActivity"
+        <activity
+            android:name=".ChangePhotoActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".ChangePhotoActivity"
+        <activity
+            android:name=".AboutActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".AboutActivity"
-            android:screenOrientation="portrait" />
+
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
+
+        <activity android:name=".VerifyActivity" />
+        <activity android:name=".SendCodeActivity" />
+        <activity android:name=".VerifyResetCodeActivity" />
+        <activity android:name=".ResetPasswordActivity"></activity>
     </application>
 
 </manifest>

@@ -67,6 +67,7 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.MyViewHold
         // loading album cover using Picasso library
         Picasso.with(mContext)
                 .load("https://img.youtube.com/vi/" + video.getVideoCode() + "/maxresdefault.jpg")
+                .fit()
                 .placeholder(R.drawable.video_placeholder)
                 .error(R.drawable.video_placeholder)
                 .into(holder.videoImg);
