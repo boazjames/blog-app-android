@@ -5,8 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/seafoam"
-    android:padding="25dp"
     tools:context="com.kiddnation254.kiddnation254.RegisterActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="25dp">
+
 
     <EditText
         android:id="@+id/username"
@@ -192,5 +197,10 @@
             android:layout_marginLeft="5dp"
             android:layout_marginStart="5dp" />
     </RelativeLayout>
+
+    </RelativeLayout>
+
+    <include layout="@layout/progress_bar"
+        android:visibility="gone"/>
 
 </RelativeLayout>

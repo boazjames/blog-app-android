@@ -5,8 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/seafoam"
-    android:padding="25dp"
     tools:context="com.kiddnation254.kiddnation254.LoginActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="25dp">
 
     <EditText
         android:id="@+id/username"
@@ -20,7 +24,7 @@
         android:drawableLeft="@drawable/baseline_account_box_white_24dp"
         android:drawableStart="@drawable/baseline_account_box_white_24dp"
         android:ems="10"
-        android:hint="@string/username_hint"
+        android:hint="@string/username_email_hint"
         android:inputType="textPersonName"
         android:paddingBottom="10dp"
         android:paddingLeft="10dp"
@@ -137,5 +141,10 @@
             android:layout_marginLeft="5dp"
             android:layout_marginStart="5dp" />
     </RelativeLayout>
+
+    </RelativeLayout>
+
+    <include layout="@layout/progress_bar"
+        android:visibility="gone"/>
 
 </RelativeLayout>

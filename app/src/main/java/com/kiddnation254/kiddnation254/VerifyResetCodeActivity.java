@@ -8,7 +8,9 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -27,6 +29,7 @@ import java.util.Map;
 public class VerifyResetCodeActivity extends AppCompatActivity {
 
     private ProgressDialog progressDialog;
+    private RelativeLayout progressBarContainer;
 
 
     @Override
@@ -39,6 +42,9 @@ public class VerifyResetCodeActivity extends AppCompatActivity {
             return;
         }
         final String email = extras.getString("email");
+
+        progressBarContainer = (RelativeLayout) findViewById(R.id.progress_bar_container);
+        progressBarContainer.setVisibility(View.GONE);
 
         final VerificationCodeEditText verificationCodeEditText = (VerificationCodeEditText) findViewById(R.id.editTextVerifyCode);
 
@@ -76,8 +82,11 @@ public class VerifyResetCodeActivity extends AppCompatActivity {
     }
 
     private void verifyCode(final String verification_code, final String email){
-        progressDialog.setMessage("verifying");
-        progressDialog.show();
+//        progressDialog.setMessage("verifying");
+//        progressDialog.show();
+        progressBarContainer.setVisibility(View.VISIBLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
         StringRequest stringRequest = new StringRequest(
                 Request.Method.POST,
@@ -85,7 +94,8 @@ public class VerifyResetCodeActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        progressDialog.hide();
+                        progressBarContainer.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
                         try {
                             JSONObject jsonObject = new JSONObject(response);
@@ -107,7 +117,9 @@ public class VerifyResetCodeActivity extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        progressDialog.hide();
+                        progressBarContainer.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
                         Toast.makeText(getApplicationContext(),
                                 "Network error please try again.", Toast.LENGTH_LONG).show();
                     }

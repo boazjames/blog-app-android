@@ -5,8 +5,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +30,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText editTextUsername;
     private EditText editTextPassword;
     private ProgressDialog progressDialog;
+    private RelativeLayout progressBarContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +42,11 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(new Intent(this, HomeActivity.class));
             return;
         }
+
+        progressBarContainer = (RelativeLayout) findViewById(R.id.progress_bar_container);
+        progressBarContainer.setVisibility(View.GONE);
+
+
 
         editTextUsername = (EditText) findViewById(R.id.username);
         editTextPassword = (EditText) findViewById(R.id.password);
@@ -51,7 +60,16 @@ public class LoginActivity extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        userLogin();
+                        final String username = editTextUsername.getText().toString().trim();
+                        final String password = editTextPassword.getText().toString().trim();
+                        if(username.length() == 0 || password.length() == 0){
+                            Toast.makeText(getApplicationContext(),
+                                    "username/email or password field is empty",
+                                    Toast.LENGTH_LONG).show();
+                        }else{
+                            userLogin(username, password);
+                        }
+
                     }
                 }
         );
@@ -75,12 +93,13 @@ public class LoginActivity extends AppCompatActivity {
         );
     }
 
-    public void userLogin(){
-        final String username = editTextUsername.getText().toString().trim();
-        final String password = editTextPassword.getText().toString().trim();
+    public void userLogin(final String username, final String password){
 
-        progressDialog.setMessage("verifying your details");
-        progressDialog.show();
+//        progressDialog.setMessage("verifying your details");
+//        progressDialog.show();
+        progressBarContainer.setVisibility(View.VISIBLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
         StringRequest stringRequest = new StringRequest(
                 Request.Method.POST,
@@ -88,7 +107,9 @@ public class LoginActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        progressDialog.hide();
+//                        progressDialog.hide();
+                        progressBarContainer.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
                         try {
                             JSONObject jsonObject = new JSONObject(response);
@@ -115,7 +136,8 @@ public class LoginActivity extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        progressDialog.hide();
+                        progressBarContainer.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                         Toast.makeText(getApplicationContext(),
                                 "Network error please try again.", Toast.LENGTH_LONG).show();
                     }

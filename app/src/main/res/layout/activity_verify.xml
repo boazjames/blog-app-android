@@ -15,8 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:elevation="13dp"
-            android:theme="@style/MyToolbar"
-            app:layout_scrollFlags="scroll|enterAlways" >
+            android:theme="@style/MyToolbar" >
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
 
@@ -27,5 +26,8 @@
 
         <include layout="@layout/content_verify" />
     </RelativeLayout>
+
+    <include layout="@layout/progress_bar"
+        android:visibility="gone"/>
 
 </android.support.design.widget.CoordinatorLayout>

@@ -319,7 +319,7 @@ public class ChangePhotoActivity extends AppCompatActivity implements EasyPermis
         @Override
         protected void onPreExecute() {
 
-            // Init and show dialog
+            // Init and show background_dialog
             this.progressDialog = new ProgressDialog(this.context);
             this.progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
             this.progressDialog.setCancelable(false);
@@ -328,7 +328,7 @@ public class ChangePhotoActivity extends AppCompatActivity implements EasyPermis
 
         @Override
         protected void onPostExecute(String result) {
-            // Close dialog
+            // Close background_dialog
             this.progressDialog.dismiss();
             try {
                 JSONObject jsonObject = new JSONObject(result);

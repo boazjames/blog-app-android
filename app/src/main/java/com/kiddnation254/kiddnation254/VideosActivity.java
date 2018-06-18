@@ -21,6 +21,7 @@ import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -62,6 +63,7 @@ public class VideosActivity extends AppCompatActivity
     private String userImgLink;
     private StoreSearchTerm storeSearchTerm;
     private RelativeLayout recycleViewContainer;
+    private RelativeLayout progressBarContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +71,9 @@ public class VideosActivity extends AppCompatActivity
         setContentView(R.layout.activity_videos);
 
         limit = "5";
+
+        progressBarContainer = (RelativeLayout) findViewById(R.id.progress_bar_container);
+        progressBarContainer.setVisibility(View.GONE);
 
         progressDialog = new ProgressDialog(this);
         showMoreVideosButton = (Button) findViewById(R.id.showMoreVideosButton);
@@ -116,6 +121,8 @@ public class VideosActivity extends AppCompatActivity
 
         userImgLink = SharedPrefManager.getInstance(getApplicationContext()).getUserImageLink();
         path = Constants.URL_USER_IMG;
+
+        navigation.getMenu().getItem(1).setChecked(true);
 
         showMoreVideosButton.setOnClickListener(
                 new View.OnClickListener() {
@@ -196,7 +203,8 @@ public class VideosActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,
+                    R.style.MyDialogTheme);
             alertDialogBuilder.setTitle("Exit App?");
             alertDialogBuilder
                     .setMessage("Do you want to quit!")
@@ -234,7 +242,8 @@ public class VideosActivity extends AppCompatActivity
         } else if (id == R.id.nav_view_profile) {
             startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
         } else if (id == R.id.nav_logout) {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,
+                    R.style.MyDialogTheme);
             alertDialogBuilder.setTitle("Logout?");
             alertDialogBuilder
                     .setMessage("Do you want to logout!")
@@ -260,7 +269,8 @@ public class VideosActivity extends AppCompatActivity
         } else if (id == R.id.nav_about) {
             startActivity(new Intent(getApplicationContext(), AboutActivity.class));
         } else if (id == R.id.nav_exit) {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,
+                    R.style.MyDialogTheme);
             alertDialogBuilder.setTitle("Exit App?");
             alertDialogBuilder
                     .setMessage("Do you want to quit!")
@@ -315,8 +325,9 @@ public class VideosActivity extends AppCompatActivity
 
     public void showFewVideos() {
 
-        progressDialog.setMessage("getting videos");
-        progressDialog.show();
+        progressBarContainer.setVisibility(View.VISIBLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
         StringRequest stringRequest = new StringRequest(
                 Request.Method.GET,
@@ -324,7 +335,8 @@ public class VideosActivity extends AppCompatActivity
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        progressDialog.hide();
+                        progressBarContainer.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                         recycleViewContainer.setVisibility(View.VISIBLE);
 
                         try {
@@ -367,7 +379,9 @@ public class VideosActivity extends AppCompatActivity
                             } else {
                                 recycleViewContainer.setVisibility(View.GONE);
                                 textViewFetchError.setVisibility(View.VISIBLE);
-                                Toast.makeText(getApplicationContext(), jsonObject.getString("message"), Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(),
+                                        jsonObject.getString("message"), Toast.LENGTH_LONG)
+                                        .show();
 
                             }
                         } catch (JSONException e) {
@@ -378,7 +392,8 @@ public class VideosActivity extends AppCompatActivity
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        progressDialog.hide();
+                        progressBarContainer.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                         recycleViewContainer.setVisibility(View.GONE);
                         textViewFetchError.setVisibility(View.VISIBLE);
                     }
@@ -454,7 +469,7 @@ public class VideosActivity extends AppCompatActivity
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), "There was an error fetching more videos", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), getString(R.string.network_error), Toast.LENGTH_LONG).show();
                     }
                 }
         );
@@ -464,8 +479,9 @@ public class VideosActivity extends AppCompatActivity
 
     public void searchFewVideos(String search_term) {
 
-        progressDialog.setMessage("getting videos");
-        progressDialog.show();
+        progressBarContainer.setVisibility(View.VISIBLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
         StringRequest stringRequest = new StringRequest(
                 Request.Method.GET,
@@ -473,7 +489,8 @@ public class VideosActivity extends AppCompatActivity
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        progressDialog.hide();
+                        progressBarContainer.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
                         videoList.clear();
                         adapter.notifyDataSetChanged();
@@ -538,9 +555,10 @@ public class VideosActivity extends AppCompatActivity
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        progressDialog.hide();
-                        recycleViewContainer.setVisibility(View.GONE);
-                        textViewFetchError.setVisibility(View.VISIBLE);
+                        progressBarContainer.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                        Toast.makeText(getApplicationContext(), getString(R.string.network_error),
+                                Toast.LENGTH_LONG).show();
                     }
                 }
         );
@@ -603,7 +621,9 @@ public class VideosActivity extends AppCompatActivity
                                 adapter.notifyDataSetChanged();
 
                             } else {
-                                Toast.makeText(getApplicationContext(), jsonObject.getString("message"), Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(),
+                                        jsonObject.getString("message"),
+                                        Toast.LENGTH_LONG).show();
 
                             }
                         } catch (JSONException e) {
@@ -614,7 +634,8 @@ public class VideosActivity extends AppCompatActivity
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), "There was an error while fetching more videos.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),
+                                getString(R.string.network_error), Toast.LENGTH_LONG).show();
                     }
                 }
         );

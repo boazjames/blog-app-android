@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -14,7 +15,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.text.Html;
-import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -24,6 +24,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -68,6 +69,7 @@ public class HomeActivity extends AppCompatActivity
     private String userImgLink;
     private StoreSearchTerm storeSearchTerm;
     private RelativeLayout recycleViewContainer;
+    private RelativeLayout progressBarContainer;
 
 
     @Override
@@ -76,6 +78,9 @@ public class HomeActivity extends AppCompatActivity
         setContentView(R.layout.activity_home);
 
         limit = "5";
+
+        progressBarContainer = (RelativeLayout) findViewById(R.id.progress_bar_container);
+        progressBarContainer.setVisibility(View.GONE);
 
         progressDialog = new ProgressDialog(this);
         showMorePostsButton = (Button) findViewById(R.id.showMorePostsButton);
@@ -98,14 +103,7 @@ public class HomeActivity extends AppCompatActivity
 
         recyclerView.setAdapter(adapter);
 
-//        preparePosts();
         showFewPosts();
-
-        /*try {
-            Picasso.with(this).load(R.drawable.cover).into((ImageView) findViewById(R.id.backdrop));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -122,6 +120,7 @@ public class HomeActivity extends AppCompatActivity
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.bottomNavigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        navigation.getMenu().getItem(0).setChecked(true);
 
         View header = navigationView.getHeaderView(0);
         textViewUsername = (TextView) header.findViewById(R.id.textViewUsername);
@@ -214,7 +213,8 @@ public class HomeActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,
+                    R.style.MyDialogTheme);
             alertDialogBuilder.setTitle("Exit App?");
             alertDialogBuilder
                     .setMessage("Do you want to quit!")
@@ -266,7 +266,8 @@ public class HomeActivity extends AppCompatActivity
         } else if (id == R.id.nav_view_profile) {
             startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
         } else if (id == R.id.nav_logout) {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,
+                    R.style.MyDialogTheme);
             alertDialogBuilder.setTitle("Logout?");
             alertDialogBuilder
                     .setMessage("Do you want to logout!")
@@ -292,7 +293,7 @@ public class HomeActivity extends AppCompatActivity
         } else if (id == R.id.nav_about) {
             startActivity(new Intent(getApplicationContext(), AboutActivity.class));
         } else if (id == R.id.nav_exit) {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this, R.style.MyDialogTheme);
             alertDialogBuilder.setTitle("Exit App?");
             alertDialogBuilder
                     .setMessage("Do you want to quit!")
@@ -346,9 +347,9 @@ public class HomeActivity extends AppCompatActivity
     };
 
     public void showFewPosts() {
-
-        progressDialog.setMessage("getting posts");
-        progressDialog.show();
+        progressBarContainer.setVisibility(View.VISIBLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
         StringRequest stringRequest = new StringRequest(
                 Request.Method.GET,
@@ -356,7 +357,8 @@ public class HomeActivity extends AppCompatActivity
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        progressDialog.hide();
+                        progressBarContainer.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                         recycleViewContainer.setVisibility(View.VISIBLE);
 
                         try {
@@ -415,7 +417,8 @@ public class HomeActivity extends AppCompatActivity
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        progressDialog.hide();
+                        progressBarContainer.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 //                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
                         recycleViewContainer.setVisibility(View.GONE);
                         textViewFetchError.setVisibility(View.VISIBLE);
@@ -497,7 +500,7 @@ public class HomeActivity extends AppCompatActivity
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(getApplicationContext(),
-                                "There was an error fetching more posts", Toast.LENGTH_LONG).show();
+                                getString(R.string.network_error), Toast.LENGTH_LONG).show();
                     }
                 }
         );
@@ -521,8 +524,9 @@ public class HomeActivity extends AppCompatActivity
 
     public void searchFewPosts(String search_term) {
 
-        progressDialog.setMessage("getting posts");
-        progressDialog.show();
+        progressBarContainer.setVisibility(View.VISIBLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
         StringRequest stringRequest = new StringRequest(
                 Request.Method.GET,
@@ -530,7 +534,8 @@ public class HomeActivity extends AppCompatActivity
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        progressDialog.hide();
+                        progressBarContainer.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
                         postList.clear();
                         adapter.notifyDataSetChanged();
@@ -583,8 +588,9 @@ public class HomeActivity extends AppCompatActivity
                                     adapter.notifyDataSetChanged();
 
                                 } else {
-                                    recycleViewContainer.setVisibility(View.GONE);
-                                    textViewNoPost.setVisibility(View.VISIBLE);
+                                    Toast.makeText(getApplicationContext(),
+                                            "No such post. Please try a different search term",
+                                            Toast.LENGTH_LONG).show();
                                 }
                             } else {
                                 Toast.makeText(getApplicationContext(),
@@ -599,9 +605,24 @@ public class HomeActivity extends AppCompatActivity
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        progressDialog.hide();
-                        recycleViewContainer.setVisibility(View.GONE);
-                        textViewFetchError.setVisibility(View.VISIBLE);
+                        progressBarContainer.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                        /*Toast toast = Toast.makeText(getApplicationContext(), getString(R.string.network_error),
+                                Toast.LENGTH_LONG);
+                        // set message color
+                        TextView textView = (TextView) toast.getView().findViewById(android.R.id.message);
+                        textView.setTextColor(Color.WHITE);
+
+                        // set background color
+                        toast.getView().setBackgroundColor(getResources().getColor(R.color.deep_aqua));
+                        toast.show();*/
+
+                        Toast toast = new Toast(getApplicationContext());
+
+                        View view = getLayoutInflater().inflate(R.layout.network_error, null);
+                        toast.setView(view);
+                        toast.setDuration(Toast.LENGTH_LONG);
+                        toast.show();
                     }
                 }
         );
@@ -680,7 +701,7 @@ public class HomeActivity extends AppCompatActivity
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(getApplicationContext(),
-                                "There was an error while fetching more posts", Toast.LENGTH_LONG).show();
+                                getString(R.string.network_error), Toast.LENGTH_LONG).show();
                     }
                 }
         );

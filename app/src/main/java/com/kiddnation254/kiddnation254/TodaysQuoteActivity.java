@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -40,11 +41,15 @@ public class TodaysQuoteActivity extends AppCompatActivity
     private ProgressDialog progressDialog;
     private String userImgLink;
     private RelativeLayout relativeLayoutContainer;
+    private RelativeLayout progressBarContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_todays_quote);
+
+        progressBarContainer = (RelativeLayout) findViewById(R.id.progress_bar_container);
+        progressBarContainer.setVisibility(View.GONE);
 
         progressDialog = new ProgressDialog(this);
         quoteBody = (TextView) findViewById(R.id.quoteBody);
@@ -73,6 +78,7 @@ public class TodaysQuoteActivity extends AppCompatActivity
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.bottomNavigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        navigation.getMenu().getItem(2).setChecked(true);
 
         View header = navigationView.getHeaderView(0);
         textViewUsername = (TextView) header.findViewById(R.id.textViewUsername);
@@ -103,7 +109,8 @@ public class TodaysQuoteActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,
+                    R.style.MyDialogTheme);
             alertDialogBuilder.setTitle("Exit App?");
             alertDialogBuilder
                     .setMessage("Do you want to quit!")
@@ -144,7 +151,6 @@ public class TodaysQuoteActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -155,7 +161,8 @@ public class TodaysQuoteActivity extends AppCompatActivity
         } else if (id == R.id.nav_view_profile) {
             startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
         } else if (id == R.id.nav_logout) {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,
+                    R.style.MyDialogTheme);
             alertDialogBuilder.setTitle("Logout?");
             alertDialogBuilder
                     .setMessage("Do you want to logout!")
@@ -181,7 +188,8 @@ public class TodaysQuoteActivity extends AppCompatActivity
         } else if (id == R.id.nav_about) {
             startActivity(new Intent(getApplicationContext(), AboutActivity.class));
         } else if (id == R.id.nav_exit) {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,
+                    R.style.MyDialogTheme);
             alertDialogBuilder.setTitle("Exit App?");
             alertDialogBuilder
                     .setMessage("Do you want to quit!")
@@ -235,8 +243,9 @@ public class TodaysQuoteActivity extends AppCompatActivity
     };
 
     public void showQuote() {
-        progressDialog.setMessage("getting quote");
-        progressDialog.show();
+        progressBarContainer.setVisibility(View.VISIBLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
         StringRequest stringRequest = new StringRequest(
                 Request.Method.GET,
@@ -244,7 +253,8 @@ public class TodaysQuoteActivity extends AppCompatActivity
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        progressDialog.hide();
+                        progressBarContainer.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
 
                         try {
@@ -271,7 +281,8 @@ public class TodaysQuoteActivity extends AppCompatActivity
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        progressDialog.hide();
+                        progressBarContainer.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                         textViewFetchError.setVisibility(View.VISIBLE);
                         relativeLayoutContainer.setVisibility(View.GONE);
                     }

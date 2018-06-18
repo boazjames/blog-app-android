@@ -8,7 +8,9 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -28,6 +30,7 @@ public class VerifyActivity extends AppCompatActivity {
     private VerificationCodeEditText verificationCodeEditText;
     private ProgressDialog progressDialog;
     private String email;
+    private RelativeLayout progressBarContainer;
 
 
     @Override
@@ -40,6 +43,9 @@ public class VerifyActivity extends AppCompatActivity {
             return;
         }
         email = extras.getString("email");
+
+        progressBarContainer = (RelativeLayout) findViewById(R.id.progress_bar_container);
+        progressBarContainer.setVisibility(View.GONE);
 
         verificationCodeEditText = (VerificationCodeEditText) findViewById(R.id.editTextCode);
         Button buttonVerify = (Button) findViewById(R.id.buttonVerify);
@@ -77,8 +83,11 @@ public class VerifyActivity extends AppCompatActivity {
     }
 
     private void verifyCode(final String code, final String email){
-        progressDialog.setMessage("verifying");
-        progressDialog.show();
+//        progressDialog.setMessage("verifying");
+//        progressDialog.show();
+        progressBarContainer.setVisibility(View.VISIBLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
         StringRequest stringRequest = new StringRequest(
                 Request.Method.POST,
@@ -86,14 +95,21 @@ public class VerifyActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        progressDialog.hide();
+                        progressBarContainer.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             if(!jsonObject.getBoolean("error")){
-                                Toast.makeText(getApplicationContext(), jsonObject.getString("message"),
-                                        Toast.LENGTH_LONG).show();
-                                startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                                SharedPrefManager.getInstance(getApplicationContext())
+                                        .userLogin(
+                                                jsonObject.getInt("id"),
+                                                jsonObject.getString("username"),
+                                                jsonObject.getString("email"),
+                                                jsonObject.getString("phone"),
+                                                jsonObject.getString("image_link")
+                                        );
+                                startActivity(new Intent(getApplicationContext(), HomeActivity.class));
                                 finish();
                             }else {
                                 Toast.makeText(getApplicationContext(), jsonObject.getString("message"), Toast.LENGTH_LONG).show();
@@ -107,7 +123,9 @@ public class VerifyActivity extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        progressDialog.hide();
+                        progressBarContainer.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
                         Toast.makeText(getApplicationContext(),
                                 "Network error please try again.", Toast.LENGTH_LONG).show();
                     }

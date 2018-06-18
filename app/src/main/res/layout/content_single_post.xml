@@ -105,8 +105,8 @@
 
     <EditText
         android:id="@+id/editTextComment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/input_comment"
         android:layout_below="@id/commentsAllButton"
@@ -117,15 +117,17 @@
     <Button
         android:id="@+id/commentButton"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/editTextComment"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
+        android:layout_height="40dp"
+        android:layout_toRightOf="@+id/editTextComment"
+        android:layout_marginLeft="3dp"
+        android:layout_below="@id/commentsAllButton"
         android:text="@string/comment_text"
         android:background="@drawable/button"
         android:textColor="#fff"
         android:layout_marginTop="10dp"
-        android:textColorLink="#000"/>
+        android:textColorLink="#000"
+        android:layout_toEndOf="@+id/editTextComment"
+        android:layout_marginStart="3dp" />
     </RelativeLayout>
 
     <TextView

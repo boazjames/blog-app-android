@@ -18,6 +18,7 @@ import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -63,6 +64,7 @@ public class SinglePostActivity extends AppCompatActivity {
     private String limit;
     private StoreNextStart storeNextStart;
     private RelativeLayout relativeLayoutContainer;
+    private RelativeLayout progressBarContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +78,9 @@ public class SinglePostActivity extends AppCompatActivity {
         postId = extras.getInt("id");
         totalComments = 0;
         limit = "4";
+
+        progressBarContainer = (RelativeLayout) findViewById(R.id.progress_bar_container);
+        progressBarContainer.setVisibility(View.GONE);
 
         postImg = (ImageView) findViewById(R.id.videoImage);
         author = (TextView) findViewById(R.id.author);
@@ -104,7 +109,7 @@ public class SinglePostActivity extends AppCompatActivity {
         adapter = new CommentsAdapter(this, commentList);
 
         recyclerView.setAdapter(adapter);
-        showPosts();
+        showPost();
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -140,9 +145,10 @@ public class SinglePostActivity extends AppCompatActivity {
         }
     }
 
-    public void showPosts() {
-        progressDialog.setMessage("getting posts");
-        progressDialog.show();
+    public void showPost() {
+        progressBarContainer.setVisibility(View.VISIBLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager
+        .LayoutParams.FLAG_NOT_TOUCHABLE);
 
         StringRequest stringRequest = new StringRequest(
                 Request.Method.GET,
@@ -150,7 +156,8 @@ public class SinglePostActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        progressDialog.hide();
+                        progressBarContainer.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
                         try {
                             final JSONObject jsonObject = new JSONObject(response);
@@ -211,7 +218,8 @@ public class SinglePostActivity extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        progressDialog.hide();
+                        progressBarContainer.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                         textViewFetchError.setVisibility(View.VISIBLE);
                         relativeLayoutContainer.setVisibility(View.GONE);
                     }
@@ -241,8 +249,6 @@ public class SinglePostActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        progressDialog.hide();
-
 
                         try {
                             JSONObject jsonObject = new JSONObject(response);
@@ -287,8 +293,8 @@ public class SinglePostActivity extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        progressDialog.hide();
-                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG);
+                        Toast.makeText(getApplicationContext(), getString(R.string.network_error),
+                                Toast.LENGTH_LONG).show();
                     }
                 }
         );
@@ -303,8 +309,6 @@ public class SinglePostActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        progressDialog.hide();
-
 
                         try {
                             JSONObject jsonObject = new JSONObject(response);
@@ -352,8 +356,8 @@ public class SinglePostActivity extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        progressDialog.hide();
-                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG);
+                        Toast.makeText(getApplicationContext(), getString(R.string.comment_fetch_error),
+                                Toast.LENGTH_LONG).show();
                     }
                 }
         );
@@ -390,7 +394,8 @@ public class SinglePostActivity extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG);
+                        Toast.makeText(getApplicationContext(), getString(R.string.comment_error),
+                                Toast.LENGTH_LONG).show();
                     }
                 }
         ) {

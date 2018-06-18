@@ -21,6 +21,7 @@
     <string name="password_hint">enter password</string>
     <string name="confirm_password_hint">confirm password</string>
     <string name="username_hint">enter username</string>
+    <string name="username_email_hint">enter username or email</string>
     <string name="email_hint">email(example@gmail.com)</string>
     <string name="phone_hint">mobile number(07XXXXXXXX)</string>
     <string name="login_text">Login</string>
@@ -203,4 +204,7 @@
     <string name="activate">activate</string>
     <string name="reset_text">Enter password reset code sent to your email</string>
     <string name="new_password_hint">enter new password</string>
+    <string name="network_error">Network error. Please try again.</string>
+    <string name="comment_fetch_error">Network error. Unable to get comments.</string>
+    <string name="comment_error">Network error. Unable to comment.</string>
 </resources>

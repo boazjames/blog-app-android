@@ -7,8 +7,10 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -27,6 +29,7 @@ public class SendCodeActivity extends AppCompatActivity {
 
     private EditText editTextEmail;
     private ProgressDialog progressDialog;
+    private RelativeLayout progressBarContainer;
 
 
     @Override
@@ -36,6 +39,9 @@ public class SendCodeActivity extends AppCompatActivity {
 
         editTextEmail = (EditText) findViewById(R.id.email);
         Button buttonSendCode = (Button) findViewById(R.id.buttonSendCode);
+
+        progressBarContainer = (RelativeLayout) findViewById(R.id.progress_bar_container);
+        progressBarContainer.setVisibility(View.GONE);
 
         progressDialog = new ProgressDialog(this);
 
@@ -70,8 +76,11 @@ public class SendCodeActivity extends AppCompatActivity {
     }
 
     private void sendCode(final String email) {
-        progressDialog.setMessage("Sending Password Reset Code");
-        progressDialog.show();
+//        progressDialog.setMessage("Sending Password Reset Code");
+//        progressDialog.show();
+        progressBarContainer.setVisibility(View.VISIBLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
         StringRequest stringRequest = new StringRequest(
                 Request.Method.POST,
@@ -79,7 +88,8 @@ public class SendCodeActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        progressDialog.hide();
+                        progressBarContainer.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
                         try {
                             JSONObject jsonObject = new JSONObject(response);
@@ -101,7 +111,9 @@ public class SendCodeActivity extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        progressDialog.hide();
+                        progressBarContainer.setVisibility(View.GONE);
+                        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
                         Toast.makeText(getApplicationContext(),
                                 "Network error please try again.", Toast.LENGTH_LONG).show();
                     }

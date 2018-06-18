@@ -1,0 +1,6 @@
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/seafoam">
+    <item android:state_pressed="true" android:drawable="@color/seafoam"/>
+    <item android:state_checked="true" android:drawable="@color/deep_aqua"/>
+    <item android:drawable="@color/ocean"/>
+</ripple>

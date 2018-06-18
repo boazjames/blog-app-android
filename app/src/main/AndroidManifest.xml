@@ -60,10 +60,14 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <activity android:name=".VerifyActivity" />
-        <activity android:name=".SendCodeActivity" />
-        <activity android:name=".VerifyResetCodeActivity" />
-        <activity android:name=".ResetPasswordActivity"></activity>
+        <activity android:name=".VerifyActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".SendCodeActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".VerifyResetCodeActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ResetPasswordActivity"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>
