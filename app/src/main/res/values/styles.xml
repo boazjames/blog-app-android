@@ -53,8 +53,20 @@
         <item name="colorAccent">@android:color/white</item>
         <!--title and message color-->
         <item name="android:textColorPrimary">@android:color/white</item>
+        <!--item text color-->
+        <item name="textColorAlertDialogListItem">@android:color/darker_gray</item>
         <!--background_dialog background-->
         <item name="android:windowBackground">@drawable/background_dialog</item>
+        <item name="android:itemTextAppearance">@android:color/white</item>
+    </style>
+
+    <style name="LinearProgress" parent="Theme.AppCompat.Light">
+        <item name="colorAccent">@color/ocean</item>
+    </style>
+
+    <style name="SnackbarTheme" parent="Theme.AppCompat.Light">
+        <item name="colorAccent">@color/deep_aqua</item>
+        <item name="android:textColor">@android:color/white</item>
     </style>
 
 </resources>

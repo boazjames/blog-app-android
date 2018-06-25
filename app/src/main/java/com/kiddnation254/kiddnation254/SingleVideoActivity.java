@@ -10,7 +10,9 @@ import android.support.v7.app.AppCompatCallback;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,9 +73,14 @@ public class SingleVideoActivity extends YouTubeBaseActivity implements AppCompa
     @Override
     protected void onStart() {
         super.onStart();
-        Toast.makeText(getApplicationContext(),
-                "Warning: Disable RESTRICT BACKGROUND DATA if it is enabled",
-                Toast.LENGTH_LONG).show();
+        Toast toast = new Toast(getApplicationContext());
+        View view = getLayoutInflater().inflate(R.layout.warning, null);
+        TextView textView = view.findViewById(R.id.message);
+        textView.setText(R.string.warning_bg_data);
+        toast.setView(view);
+        int gravity = Gravity.BOTTOM;
+        toast.setGravity(gravity, 10, 10);
+        toast.show();
     }
 
     @Override

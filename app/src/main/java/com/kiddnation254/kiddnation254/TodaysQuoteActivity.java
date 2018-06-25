@@ -13,6 +13,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,14 +35,14 @@ import org.json.JSONObject;
 public class TodaysQuoteActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private ImageView imageViewUser;
+    private ImageView imageViewUser, refresh;
     private TextView textViewUsername, textViewFetchError;
     private String path;
     private TextView quoteBody, quoteAuothor;
     private ProgressDialog progressDialog;
     private String userImgLink;
     private RelativeLayout relativeLayoutContainer;
-    private RelativeLayout progressBarContainer;
+    private RelativeLayout progressBarContainer, fetchError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,10 +55,11 @@ public class TodaysQuoteActivity extends AppCompatActivity
         progressDialog = new ProgressDialog(this);
         quoteBody = (TextView) findViewById(R.id.quoteBody);
         quoteAuothor = (TextView) findViewById(R.id.quoteAuthor);
-        textViewFetchError = (TextView) findViewById(R.id.fetch_error);
+        fetchError = (RelativeLayout) findViewById(R.id.fetch_error);
         relativeLayoutContainer = (RelativeLayout) findViewById(R.id.relativeLayoutContainer);
+        refresh = (ImageView) findViewById(R.id.refresh);
 
-        textViewFetchError.setVisibility(View.GONE);
+        fetchError.setVisibility(View.GONE);
         relativeLayoutContainer.setVisibility(View.GONE);
 
         showQuote();
@@ -87,6 +89,18 @@ public class TodaysQuoteActivity extends AppCompatActivity
 
         userImgLink = SharedPrefManager.getInstance(getApplicationContext()).getUserImageLink();
         path = Constants.URL_USER_IMG;
+
+        refresh.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        finish();
+                        overridePendingTransition( 0, 0);
+                        startActivity(getIntent());
+                        overridePendingTransition( 0, 0);
+                    }
+                }
+        );
 
     }
 
@@ -157,7 +171,7 @@ public class TodaysQuoteActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_change_profile_picture) {
-            startActivity(new Intent(getApplicationContext(), ChangePhotoActivity.class));
+            startActivity(new Intent(getApplicationContext(), ChangeProfilePhotoActivity.class));
         } else if (id == R.id.nav_view_profile) {
             startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
         } else if (id == R.id.nav_logout) {
@@ -188,30 +202,9 @@ public class TodaysQuoteActivity extends AppCompatActivity
         } else if (id == R.id.nav_about) {
             startActivity(new Intent(getApplicationContext(), AboutActivity.class));
         } else if (id == R.id.nav_exit) {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,
-                    R.style.MyDialogTheme);
-            alertDialogBuilder.setTitle("Exit App?");
-            alertDialogBuilder
-                    .setMessage("Do you want to quit!")
-                    .setCancelable(false)
-                    .setPositiveButton("Yes",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    moveTaskToBack(true);
-                                    android.os.Process.killProcess(android.os.Process.myPid());
-                                    System.exit(1);
-                                }
-                            })
-
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-
-                            dialog.cancel();
-                        }
-                    });
-
-            AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
+            moveTaskToBack(true);
+            android.os.Process.killProcess(android.os.Process.myPid());
+            System.exit(1);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -270,8 +263,14 @@ public class TodaysQuoteActivity extends AppCompatActivity
                                 relativeLayoutContainer.setVisibility(View.VISIBLE);
 
                             } else {
-                                Toast.makeText(getApplicationContext(), jsonObject.getString("message"), Toast.LENGTH_LONG).show();
-
+                                Toast toast = new Toast(getApplicationContext());
+                                View view = getLayoutInflater().inflate(R.layout.warning, null);
+                                TextView textView = view.findViewById(R.id.message);
+                                textView.setText(jsonObject.getString("message"));
+                                toast.setView(view);
+                                int gravity = Gravity.BOTTOM;
+                                toast.setGravity(gravity, 10, 10);
+                                toast.show();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -283,7 +282,7 @@ public class TodaysQuoteActivity extends AppCompatActivity
                     public void onErrorResponse(VolleyError error) {
                         progressBarContainer.setVisibility(View.GONE);
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                        textViewFetchError.setVisibility(View.VISIBLE);
+                        fetchError.setVisibility(View.VISIBLE);
                         relativeLayoutContainer.setVisibility(View.GONE);
                     }
                 }

@@ -168,26 +168,20 @@
         Please give us 5 stars on Play Store if you like this app.
     </string>
     <string name="hint_search">Search...</string>
-    <string name="no_post">Sorry, there is no such post.\n
-        Try a different search term.</string>
+    <string name="no_post">Sorry, there is no such post. Try a different search term.</string>
     <string name="error_fetch_post">
-        Sorry, there was an error while fetching the posts.\n
+        Sorry, there was an error while fetching the posts.
         Please check your internet connection.
     </string>
-    <string name="no_video">
-        Sorry, there is no such video.\n
-        Try a different search term.
-    </string>
-    <string name="error_fetch_video">
-        Sorry, there was an error while fetching the videos.\n
+    <string name="no_video">Sorry, there is no such video. Try a different search term.</string>
+    <string name="error_fetch_video">Sorry, there was an error while fetching the videos.
         Please check your internet connection.
     </string>
-    <string name="error_fetch_single_post">
-        Sorry, there was an error while fetching the post.\n
+    <string name="error_fetch_single_post">Sorry, there was an error while fetching the post.
         Please check your internet connection.
     </string>
     <string name="error_fetch_quote">
-        Sorry, there was an error while fetching the Today\'s Quote.\n
+        Sorry, there was an error while fetching the Today\'s Quote.
         Please check your internet connection.
     </string>
     <string name="version">Version: 1.0</string>
@@ -207,4 +201,8 @@
     <string name="network_error">Network error. Please try again.</string>
     <string name="comment_fetch_error">Network error. Unable to get comments.</string>
     <string name="comment_error">Network error. Unable to comment.</string>
+    <string name="empty_field">Please fill all required field.</string>
+    <string name="empty_field_username_password">Please fill all required field.</string>
+    <string name="no_file">Please select an image first</string>
+    <string name="warning_bg_data">Do not RESTRICT BACKGROUND DATA</string>
 </resources>

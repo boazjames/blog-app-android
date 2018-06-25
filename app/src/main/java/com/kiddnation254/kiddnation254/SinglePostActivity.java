@@ -15,6 +15,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,7 +56,7 @@ public class SinglePostActivity extends AppCompatActivity {
     private CommentsAdapter adapter;
     private List<Comment> commentList;
     private ProgressDialog progressDialog;
-    private ImageView userImg, postImg;
+    private ImageView userImg, postImg, refresh;
     private TextView author, postedAt, postBody, commentHeading, postTitle, textViewFetchError;
     private int postId;
     private int totalComments;
@@ -64,7 +65,7 @@ public class SinglePostActivity extends AppCompatActivity {
     private String limit;
     private StoreNextStart storeNextStart;
     private RelativeLayout relativeLayoutContainer;
-    private RelativeLayout progressBarContainer;
+    private RelativeLayout progressBarContainer, fetchError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,10 +92,11 @@ public class SinglePostActivity extends AppCompatActivity {
         editTextComment = (EditText) findViewById(R.id.editTextComment);
         commentButton = (Button) findViewById(R.id.commentButton);
         postTitle = (TextView) findViewById(R.id.postTitle);
-        textViewFetchError = (TextView) findViewById(R.id.fetch_error);
+        fetchError = (RelativeLayout) findViewById(R.id.fetch_error);
         relativeLayoutContainer = (RelativeLayout) findViewById(R.id.relativeLayoutContainer);
+        refresh = (ImageView) findViewById(R.id.refresh);
 
-        textViewFetchError.setVisibility(View.GONE);
+        fetchError.setVisibility(View.GONE);
         relativeLayoutContainer.setVisibility(View.GONE);
 
 
@@ -126,6 +128,19 @@ public class SinglePostActivity extends AppCompatActivity {
                         String comment = editTextComment.getText().toString();
                         String user_id = Integer.toString(SharedPrefManager.getInstance(getApplicationContext()).getUserId());
                         addComment(Integer.toString(postId), comment, user_id);
+                    }
+                }
+        );
+
+        refresh.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = getIntent();
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        overridePendingTransition( 0, 0);
+                        startActivity(intent);
+                        overridePendingTransition( 0, 0);
                     }
                 }
         );
@@ -207,8 +222,14 @@ public class SinglePostActivity extends AppCompatActivity {
                                 );
 
                             } else {
-                                Toast.makeText(getApplicationContext(), jsonObject.getString("message"), Toast.LENGTH_LONG).show();
-
+                                Toast toast = new Toast(getApplicationContext());
+                                View view = getLayoutInflater().inflate(R.layout.warning, null);
+                                TextView textView = view.findViewById(R.id.message);
+                                textView.setText(jsonObject.getString("message"));
+                                toast.setView(view);
+                                int gravity = Gravity.BOTTOM;
+                                toast.setGravity(gravity, 10, 10);
+                                toast.show();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -220,7 +241,7 @@ public class SinglePostActivity extends AppCompatActivity {
                     public void onErrorResponse(VolleyError error) {
                         progressBarContainer.setVisibility(View.GONE);
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                        textViewFetchError.setVisibility(View.VISIBLE);
+                        fetchError.setVisibility(View.VISIBLE);
                         relativeLayoutContainer.setVisibility(View.GONE);
                     }
                 }
@@ -282,8 +303,14 @@ public class SinglePostActivity extends AppCompatActivity {
                                 commentList.addAll(commentListNew);
                                 adapter.notifyDataSetChanged();
                             } else {
-                                Toast.makeText(getApplicationContext(), jsonObject.getString("message"), Toast.LENGTH_LONG).show();
-
+                                Toast toast = new Toast(getApplicationContext());
+                                View view = getLayoutInflater().inflate(R.layout.warning, null);
+                                TextView textView = view.findViewById(R.id.message);
+                                textView.setText(jsonObject.getString("message"));
+                                toast.setView(view);
+                                int gravity = Gravity.BOTTOM;
+                                toast.setGravity(gravity, 10, 10);
+                                toast.show();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -293,8 +320,12 @@ public class SinglePostActivity extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), getString(R.string.network_error),
-                                Toast.LENGTH_LONG).show();
+                        Toast toast = new Toast(getApplicationContext());
+                        View view = getLayoutInflater().inflate(R.layout.network_error, null);
+                        toast.setView(view);
+                        int gravity = Gravity.BOTTOM;
+                        toast.setGravity(gravity, 10, 10);
+                        toast.show();
                     }
                 }
         );
@@ -345,8 +376,14 @@ public class SinglePostActivity extends AppCompatActivity {
                                 }
 
                             } else {
-                                Toast.makeText(getApplicationContext(), jsonObject.getString("message"), Toast.LENGTH_LONG).show();
-
+                                Toast toast = new Toast(getApplicationContext());
+                                View view = getLayoutInflater().inflate(R.layout.warning, null);
+                                TextView textView = view.findViewById(R.id.message);
+                                textView.setText(jsonObject.getString("message"));
+                                toast.setView(view);
+                                int gravity = Gravity.BOTTOM;
+                                toast.setGravity(gravity, 10, 10);
+                                toast.show();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -356,8 +393,13 @@ public class SinglePostActivity extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), getString(R.string.comment_fetch_error),
-                                Toast.LENGTH_LONG).show();
+
+                        Toast toast = new Toast(getApplicationContext());
+                        View view = getLayoutInflater().inflate(R.layout.network_error, null);
+                        toast.setView(view);
+                        int gravity = Gravity.BOTTOM;
+                        toast.setGravity(gravity, 10, 10);
+                        toast.show();
                     }
                 }
         );
@@ -383,8 +425,14 @@ public class SinglePostActivity extends AppCompatActivity {
                                 Toast.makeText(getApplicationContext(), jsonObject.getString("message"), Toast.LENGTH_LONG).show();
 
                             } else {
-                                Toast.makeText(getApplicationContext(), jsonObject.getString("message"), Toast.LENGTH_LONG).show();
-
+                                Toast toast = new Toast(getApplicationContext());
+                                View view = getLayoutInflater().inflate(R.layout.warning, null);
+                                TextView textView = view.findViewById(R.id.message);
+                                textView.setText(jsonObject.getString("message"));
+                                toast.setView(view);
+                                int gravity = Gravity.BOTTOM;
+                                toast.setGravity(gravity, 10, 10);
+                                toast.show();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -394,8 +442,12 @@ public class SinglePostActivity extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), getString(R.string.comment_error),
-                                Toast.LENGTH_LONG).show();
+                        Toast toast = new Toast(getApplicationContext());
+                        View view = getLayoutInflater().inflate(R.layout.network_error, null);
+                        toast.setView(view);
+                        int gravity = Gravity.BOTTOM;
+                        toast.setGravity(gravity, 10, 10);
+                        toast.show();
                     }
                 }
         ) {

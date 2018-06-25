@@ -15,6 +15,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.text.Html;
+import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -54,7 +55,7 @@ import java.util.List;
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private ImageView imageViewUser;
+    private ImageView imageViewUser, refresh;
     private TextView textViewUsername, textViewNoPost, textViewFetchError;
     private String path, postImgPath;
     private RecyclerView recyclerView;
@@ -69,7 +70,7 @@ public class HomeActivity extends AppCompatActivity
     private String userImgLink;
     private StoreSearchTerm storeSearchTerm;
     private RelativeLayout recycleViewContainer;
-    private RelativeLayout progressBarContainer;
+    private RelativeLayout progressBarContainer, fetch_error;
 
 
     @Override
@@ -86,12 +87,11 @@ public class HomeActivity extends AppCompatActivity
         showMorePostsButton = (Button) findViewById(R.id.showMorePostsButton);
         showMoreSearchPostsButton = (Button) findViewById(R.id.showMoreSearchPostsButton);
         recycleViewContainer = (RelativeLayout) findViewById(R.id.recycler_view_container);
-        textViewNoPost = (TextView) findViewById(R.id.no_post);
-        textViewFetchError = (TextView) findViewById(R.id.fetch_error);
+        fetch_error = (RelativeLayout) findViewById(R.id.fetch_error);
+        refresh = (ImageView) findViewById(R.id.refresh);
 
         recycleViewContainer.setVisibility(View.GONE);
-        textViewNoPost.setVisibility(View.GONE);
-        textViewFetchError.setVisibility(View.GONE);
+        fetch_error.setVisibility(View.GONE);
 
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -145,6 +145,18 @@ public class HomeActivity extends AppCompatActivity
                     @Override
                     public void onClick(View view) {
                         searchMorePosts(storeSearchTerm.getSearchTerm(), storeNextStart.getStart());
+                    }
+                }
+        );
+
+        refresh.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        finish();
+                        overridePendingTransition( 0, 0);
+                        startActivity(getIntent());
+                        overridePendingTransition( 0, 0);
                     }
                 }
         );
@@ -255,14 +267,13 @@ public class HomeActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (id == R.id.nav_change_profile_picture) {
-            startActivity(new Intent(getApplicationContext(), ChangePhotoActivity.class));
+            startActivity(new Intent(getApplicationContext(), ChangeProfilePhotoActivity.class));
         } else if (id == R.id.nav_view_profile) {
             startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
         } else if (id == R.id.nav_logout) {
@@ -293,29 +304,9 @@ public class HomeActivity extends AppCompatActivity
         } else if (id == R.id.nav_about) {
             startActivity(new Intent(getApplicationContext(), AboutActivity.class));
         } else if (id == R.id.nav_exit) {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this, R.style.MyDialogTheme);
-            alertDialogBuilder.setTitle("Exit App?");
-            alertDialogBuilder
-                    .setMessage("Do you want to quit!")
-                    .setCancelable(false)
-                    .setPositiveButton("Yes",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    moveTaskToBack(true);
-                                    android.os.Process.killProcess(android.os.Process.myPid());
-                                    System.exit(1);
-                                }
-                            })
-
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-
-                            dialog.cancel();
-                        }
-                    });
-
-            AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
+            moveTaskToBack(true);
+            android.os.Process.killProcess(android.os.Process.myPid());
+            System.exit(1);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -405,8 +396,14 @@ public class HomeActivity extends AppCompatActivity
                             } else {
                                 recycleViewContainer.setVisibility(View.GONE);
                                 textViewFetchError.setVisibility(View.VISIBLE);
-                                Toast.makeText(getApplicationContext(),
-                                        jsonObject.getString("message"), Toast.LENGTH_LONG).show();
+                                Toast toast = new Toast(getApplicationContext());
+                                View view = getLayoutInflater().inflate(R.layout.warning, null);
+                                TextView textView = view.findViewById(R.id.message);
+                                textView.setText(jsonObject.getString("message"));
+                                toast.setView(view);
+                                int gravity = Gravity.BOTTOM;
+                                toast.setGravity(gravity, 10, 10);
+                                toast.show();
 
                             }
                         } catch (JSONException e) {
@@ -421,7 +418,7 @@ public class HomeActivity extends AppCompatActivity
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 //                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
                         recycleViewContainer.setVisibility(View.GONE);
-                        textViewFetchError.setVisibility(View.VISIBLE);
+                        fetch_error.setVisibility(View.VISIBLE);
                     }
                 }
         );
@@ -487,8 +484,14 @@ public class HomeActivity extends AppCompatActivity
                                 adapter.notifyDataSetChanged();
 
                             } else {
-                                Toast.makeText(getApplicationContext(),
-                                        jsonObject.getString("message"), Toast.LENGTH_LONG).show();
+                                Toast toast = new Toast(getApplicationContext());
+                                View view = getLayoutInflater().inflate(R.layout.warning, null);
+                                TextView textView = view.findViewById(R.id.message);
+                                textView.setText(jsonObject.getString("message"));
+                                toast.setView(view);
+                                int gravity = Gravity.BOTTOM;
+                                toast.setGravity(gravity, 10, 10);
+                                toast.show();
 
                             }
                         } catch (JSONException e) {
@@ -499,8 +502,12 @@ public class HomeActivity extends AppCompatActivity
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(),
-                                getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                        Toast toast = new Toast(getApplicationContext());
+                        View view = getLayoutInflater().inflate(R.layout.network_error, null);
+                        toast.setView(view);
+                        int gravity = Gravity.BOTTOM;
+                        toast.setGravity(gravity, 10, 10);
+                        toast.show();
                     }
                 }
         );
@@ -588,13 +595,24 @@ public class HomeActivity extends AppCompatActivity
                                     adapter.notifyDataSetChanged();
 
                                 } else {
-                                    Toast.makeText(getApplicationContext(),
-                                            "No such post. Please try a different search term",
-                                            Toast.LENGTH_LONG).show();
+                                    Toast toast = new Toast(getApplicationContext());
+                                    View view = getLayoutInflater().inflate(R.layout.warning, null);
+                                    TextView textView = view.findViewById(R.id.message);
+                                    textView.setText(R.string.no_post);
+                                    toast.setView(view);
+                                    int gravity = Gravity.BOTTOM;
+                                    toast.setGravity(gravity, 10, 10);
+                                    toast.show();
                                 }
                             } else {
-                                Toast.makeText(getApplicationContext(),
-                                        jsonObject.getString("message"), Toast.LENGTH_LONG).show();
+                                Toast toast = new Toast(getApplicationContext());
+                                View view = getLayoutInflater().inflate(R.layout.warning, null);
+                                TextView textView = view.findViewById(R.id.message);
+                                textView.setText(jsonObject.getString("message"));
+                                toast.setView(view);
+                                int gravity = Gravity.BOTTOM;
+                                toast.setGravity(gravity, 10, 10);
+                                toast.show();
 
                             }
                         } catch (JSONException e) {
@@ -622,6 +640,8 @@ public class HomeActivity extends AppCompatActivity
                         View view = getLayoutInflater().inflate(R.layout.network_error, null);
                         toast.setView(view);
                         toast.setDuration(Toast.LENGTH_LONG);
+                        int gravity = Gravity.BOTTOM;
+                        toast.setGravity(gravity, 10, 10);
                         toast.show();
                     }
                 }
@@ -688,8 +708,14 @@ public class HomeActivity extends AppCompatActivity
                                 adapter.notifyDataSetChanged();
 
                             } else {
-                                Toast.makeText(getApplicationContext(),
-                                        jsonObject.getString("message"), Toast.LENGTH_LONG).show();
+                                Toast toast = new Toast(getApplicationContext());
+                                View view = getLayoutInflater().inflate(R.layout.warning, null);
+                                TextView textView = view.findViewById(R.id.message);
+                                textView.setText(jsonObject.getString("message"));
+                                toast.setView(view);
+                                int gravity = Gravity.BOTTOM;
+                                toast.setGravity(gravity, 10, 10);
+                                toast.show();
 
                             }
                         } catch (JSONException e) {
@@ -700,8 +726,12 @@ public class HomeActivity extends AppCompatActivity
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(),
-                                getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                        Toast toast = new Toast(getApplicationContext());
+                        View view = getLayoutInflater().inflate(R.layout.network_error, null);
+                        toast.setView(view);
+                        int gravity = Gravity.BOTTOM;
+                        toast.setGravity(gravity, 10, 10);
+                        toast.show();
                     }
                 }
         );

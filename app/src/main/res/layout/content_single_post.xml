@@ -119,7 +119,7 @@
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:layout_toRightOf="@+id/editTextComment"
-        android:layout_marginLeft="3dp"
+        android:layout_marginLeft="2dp"
         android:layout_below="@id/commentsAllButton"
         android:text="@string/comment_text"
         android:background="@drawable/button"
@@ -127,20 +127,42 @@
         android:layout_marginTop="10dp"
         android:textColorLink="#000"
         android:layout_toEndOf="@+id/editTextComment"
-        android:layout_marginStart="3dp" />
+        android:layout_marginStart="2dp" />
     </RelativeLayout>
 
-    <TextView
+    <RelativeLayout
         android:id="@+id/fetch_error"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="200dp"
-        android:gravity="center_horizontal"
-        android:text="@string/error_fetch_single_post"
-        android:textColor="#000"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:visibility="gone" />
+        android:layout_height="match_parent"
+        android:background="@color/seafoam">
+        <ImageView
+            android:id="@id/imageView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="100dp"
+            android:tint="@color/ocean"
+            android:src="@drawable/baseline_signal_cellular_connected_no_internet_4_bar_white_24dp"/>
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/imageView"
+            android:padding="10dp"
+            android:gravity="center"
+            android:text="@string/error_fetch_single_post"
+            android:textColor="#000"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="visible" />
+        <ImageView
+            android:id="@+id/refresh"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_below="@id/textView"
+            android:layout_centerHorizontal="true"
+            android:tint="@color/ocean"
+            android:src="@drawable/baseline_refresh_white_48dp"/>
+    </RelativeLayout>
 
 </RelativeLayout>

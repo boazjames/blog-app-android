@@ -18,6 +18,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,7 +49,7 @@ import java.util.List;
 public class VideosActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private ImageView imageViewUser;
+    private ImageView imageViewUser, refresh;
     private TextView textViewUsername, textViewFetchError, textViewNoVideo;
     private String path;
     private RecyclerView recyclerView;
@@ -63,7 +64,7 @@ public class VideosActivity extends AppCompatActivity
     private String userImgLink;
     private StoreSearchTerm storeSearchTerm;
     private RelativeLayout recycleViewContainer;
-    private RelativeLayout progressBarContainer;
+    private RelativeLayout progressBarContainer, fetchErrorContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,12 +80,11 @@ public class VideosActivity extends AppCompatActivity
         showMoreVideosButton = (Button) findViewById(R.id.showMoreVideosButton);
         showMoreSearchVideosButton = (Button) findViewById(R.id.showMoreSearchVideosButton);
         recycleViewContainer = (RelativeLayout) findViewById(R.id.recycler_view_container);
-        textViewNoVideo = (TextView) findViewById(R.id.no_videos);
-        textViewFetchError = (TextView) findViewById(R.id.fetch_error);
+        fetchErrorContainer = (RelativeLayout) findViewById(R.id.fetch_error);
+        refresh = (ImageView) findViewById(R.id.refresh);
 
         recycleViewContainer.setVisibility(View.GONE);
-        textViewNoVideo.setVisibility(View.GONE);
-        textViewFetchError.setVisibility(View.GONE);
+        fetchErrorContainer.setVisibility(View.GONE);
 
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view_videos);
@@ -142,6 +142,18 @@ public class VideosActivity extends AppCompatActivity
                 }
         );
 
+        refresh.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        finish();
+                        overridePendingTransition( 0, 0);
+                        startActivity(getIntent());
+                        overridePendingTransition( 0, 0);
+                    }
+                }
+        );
+
     }
 
     @Override
@@ -182,7 +194,7 @@ public class VideosActivity extends AppCompatActivity
                     Toast.makeText(getApplicationContext(), "Please enter at least 3 characters",
                             Toast.LENGTH_LONG).show();
                 } else {
-                searchFewVideos(searchTerm);
+                    searchFewVideos(searchTerm);
                     storeSearchTerm = new StoreSearchTerm(searchTerm);
                 }
                 return false;
@@ -231,14 +243,13 @@ public class VideosActivity extends AppCompatActivity
     }
 
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (id == R.id.nav_change_profile_picture) {
-            startActivity(new Intent(getApplicationContext(), ChangePhotoActivity.class));
+            startActivity(new Intent(getApplicationContext(), ChangeProfilePhotoActivity.class));
         } else if (id == R.id.nav_view_profile) {
             startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
         } else if (id == R.id.nav_logout) {
@@ -269,30 +280,9 @@ public class VideosActivity extends AppCompatActivity
         } else if (id == R.id.nav_about) {
             startActivity(new Intent(getApplicationContext(), AboutActivity.class));
         } else if (id == R.id.nav_exit) {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this,
-                    R.style.MyDialogTheme);
-            alertDialogBuilder.setTitle("Exit App?");
-            alertDialogBuilder
-                    .setMessage("Do you want to quit!")
-                    .setCancelable(false)
-                    .setPositiveButton("Yes",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    moveTaskToBack(true);
-                                    android.os.Process.killProcess(android.os.Process.myPid());
-                                    System.exit(1);
-                                }
-                            })
-
-                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-
-                            dialog.cancel();
-                        }
-                    });
-
-            AlertDialog alertDialog = alertDialogBuilder.create();
-            alertDialog.show();
+            moveTaskToBack(true);
+            android.os.Process.killProcess(android.os.Process.myPid());
+            System.exit(1);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -379,10 +369,6 @@ public class VideosActivity extends AppCompatActivity
                             } else {
                                 recycleViewContainer.setVisibility(View.GONE);
                                 textViewFetchError.setVisibility(View.VISIBLE);
-                                Toast.makeText(getApplicationContext(),
-                                        jsonObject.getString("message"), Toast.LENGTH_LONG)
-                                        .show();
-
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -395,7 +381,7 @@ public class VideosActivity extends AppCompatActivity
                         progressBarContainer.setVisibility(View.GONE);
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                         recycleViewContainer.setVisibility(View.GONE);
-                        textViewFetchError.setVisibility(View.VISIBLE);
+                        fetchErrorContainer.setVisibility(View.VISIBLE);
                     }
                 }
         );
@@ -458,8 +444,14 @@ public class VideosActivity extends AppCompatActivity
                                 adapter.notifyDataSetChanged();
 
                             } else {
-                                Toast.makeText(getApplicationContext(), jsonObject.getString("message"), Toast.LENGTH_LONG).show();
-
+                                Toast toast = new Toast(getApplicationContext());
+                                View view = getLayoutInflater().inflate(R.layout.warning, null);
+                                TextView textView = view.findViewById(R.id.message);
+                                textView.setText(jsonObject.getString("message"));
+                                toast.setView(view);
+                                int gravity = Gravity.BOTTOM;
+                                toast.setGravity(gravity, 10, 10);
+                                toast.show();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -469,7 +461,12 @@ public class VideosActivity extends AppCompatActivity
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                        Toast toast = new Toast(getApplicationContext());
+                        View view = getLayoutInflater().inflate(R.layout.network_error, null);
+                        toast.setView(view);
+                        int gravity = Gravity.BOTTOM;
+                        toast.setGravity(gravity, 10, 10);
+                        toast.show();
                     }
                 }
         );
@@ -544,8 +541,14 @@ public class VideosActivity extends AppCompatActivity
                                     textViewNoVideo.setVisibility(View.VISIBLE);
                                 }
                             } else {
-                                Toast.makeText(getApplicationContext(), jsonObject.getString("message"), Toast.LENGTH_LONG).show();
-
+                                Toast toast = new Toast(getApplicationContext());
+                                View view = getLayoutInflater().inflate(R.layout.warning, null);
+                                TextView textView = view.findViewById(R.id.message);
+                                textView.setText(jsonObject.getString("message"));
+                                toast.setView(view);
+                                int gravity = Gravity.BOTTOM;
+                                toast.setGravity(gravity, 10, 10);
+                                toast.show();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -557,8 +560,12 @@ public class VideosActivity extends AppCompatActivity
                     public void onErrorResponse(VolleyError error) {
                         progressBarContainer.setVisibility(View.GONE);
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                        Toast.makeText(getApplicationContext(), getString(R.string.network_error),
-                                Toast.LENGTH_LONG).show();
+                        Toast toast = new Toast(getApplicationContext());
+                        View view = getLayoutInflater().inflate(R.layout.network_error, null);
+                        toast.setView(view);
+                        int gravity = Gravity.BOTTOM;
+                        toast.setGravity(gravity, 10, 10);
+                        toast.show();
                     }
                 }
         );
@@ -621,9 +628,14 @@ public class VideosActivity extends AppCompatActivity
                                 adapter.notifyDataSetChanged();
 
                             } else {
-                                Toast.makeText(getApplicationContext(),
-                                        jsonObject.getString("message"),
-                                        Toast.LENGTH_LONG).show();
+                                Toast toast = new Toast(getApplicationContext());
+                                View view = getLayoutInflater().inflate(R.layout.warning, null);
+                                TextView textView = view.findViewById(R.id.message);
+                                textView.setText(jsonObject.getString("message"));
+                                toast.setView(view);
+                                int gravity = Gravity.BOTTOM;
+                                toast.setGravity(gravity, 10, 10);
+                                toast.show();
 
                             }
                         } catch (JSONException e) {

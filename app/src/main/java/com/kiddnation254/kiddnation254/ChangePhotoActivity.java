@@ -10,30 +10,27 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.squareup.picasso.Picasso;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -48,9 +45,12 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.List;
 
 import pub.devrel.easypermissions.EasyPermissions;
@@ -64,22 +64,29 @@ public class ChangePhotoActivity extends AppCompatActivity implements EasyPermis
     TextView fileName;
     LinearLayout linearLayout;
     RelativeLayout relativeLayout;
+    RelativeLayout progressBarContainer;
     Uri fileUri;
+    Helpers helpers;
     private File file;
     private static final int REQUEST_FILE_CODE = 200;
     private static final int READ_REQUEST_CODE = 300;
+    private int GALLERY = 1, CAMERA = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_photo);
+        helpers = new Helpers(this);
 
         fileBrowseBtn = findViewById(R.id.btn_choose_file);
         uploadBtn = findViewById(R.id.btn_upload);
-        previewImage = findViewById(R.id.iv_preview);
+        previewImage = findViewById(R.id.img_preview);
         fileName = findViewById(R.id.tv_file_name);
         linearLayout = (LinearLayout) findViewById(R.id.linearLayout);
         relativeLayout = (RelativeLayout) findViewById(R.id.relativeLayout1);
+//        progressBarContainer = (RelativeLayout) findViewById(R.id.progress_bar_container);
+
+//        progressBarContainer.setVisibility(View.GONE);
 
         fileBrowseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,7 +94,7 @@ public class ChangePhotoActivity extends AppCompatActivity implements EasyPermis
 
                 //check if app has permission to access the external storage.
                 if (EasyPermissions.hasPermissions(ChangePhotoActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                    showFileChooserIntent();
+                    showPictureDialog();
 
                 } else {
                     //If permission is not present request for the same.
@@ -101,13 +108,27 @@ public class ChangePhotoActivity extends AppCompatActivity implements EasyPermis
             @Override
             public void onClick(View v) {
                 if (file != null) {
-                    UploadAsyncTask uploadAsyncTask = new UploadAsyncTask(ChangePhotoActivity.this);
-                    uploadAsyncTask.execute();
+                    if (helpers.isConnectedToInternet()) {
+                        UploadAsyncTask uploadAsyncTask = new UploadAsyncTask(ChangePhotoActivity.this);
+                        uploadAsyncTask.execute();
+                    } else {
+                        Toast toast = new Toast(getApplicationContext());
+                        View view = getLayoutInflater().inflate(R.layout.network_error, null);
+                        toast.setView(view);
+                        int gravity = Gravity.BOTTOM;
+                        toast.setGravity(gravity, 10, 10);
+                        toast.show();
+                    }
 
                 } else {
-                    Toast.makeText(getApplicationContext(),
-                            "Please select a file first", Toast.LENGTH_LONG).show();
-
+                    Toast toast = new Toast(getApplicationContext());
+                    View view = getLayoutInflater().inflate(R.layout.warning, null);
+                    TextView textView = view.findViewById(R.id.message);
+                    textView.setText(R.string.no_file);
+                    toast.setView(view);
+                    int gravity = Gravity.BOTTOM;
+                    toast.setGravity(gravity, 10, 10);
+                    toast.show();
                 }
             }
         });
@@ -125,8 +146,6 @@ public class ChangePhotoActivity extends AppCompatActivity implements EasyPermis
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                // todo: goto back activity from here
-
                 onBackPressed();
 
             default:
@@ -135,14 +154,45 @@ public class ChangePhotoActivity extends AppCompatActivity implements EasyPermis
     }
 
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_FILE_CODE && resultCode == Activity.RESULT_OK) {
-            fileUri = data.getData();
-            previewFile(fileUri);
+        if (resultCode == Activity.RESULT_OK && data != null) {
+            if (requestCode == GALLERY) {
+                fileUri = data.getData();
+                previewFile(fileUri);
+
+            } else if (requestCode == CAMERA) {
+                Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+                fileUri = getImageUri(this, bitmap);
+                previewFile(fileUri);
+
+            }
 
         }
+
+        /*super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == this.RESULT_CANCELED) {
+            return;
+        }*/
+        /*if (requestCode == GALLERY) {
+            if (data != null) {
+                fileUri = data.getData();
+                previewFile(fileUri);
+            }
+
+        } else if (requestCode == CAMERA) {
+            if (data != null) {
+                fileUri = data.getData();
+                previewFile(fileUri);
+            }
+        }*/
+    }
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
     }
 
     /**
@@ -182,9 +232,45 @@ public class ChangePhotoActivity extends AppCompatActivity implements EasyPermis
     private void showFileChooserIntent() {
         Intent fileManagerIntent = new Intent(Intent.ACTION_GET_CONTENT);
         //Choose any file
-        fileManagerIntent.setType("*/*");
+        fileManagerIntent.setType("image/*");
         startActivityForResult(fileManagerIntent, REQUEST_FILE_CODE);
 
+    }
+
+    public void choosePhotoFromGallery() {
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+        startActivityForResult(galleryIntent, GALLERY);
+    }
+
+    private void takePhotoFromCamera() {
+        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, CAMERA);
+    }
+
+    private void showPictureDialog() {
+        AlertDialog.Builder pictureDialog = new AlertDialog.Builder(this,
+                R.style.MyDialogTheme);
+        pictureDialog.setTitle("Select Action");
+        String[] pictureDialogItems = {
+                "Photo Gallery",
+                "Camera"};
+        pictureDialog.setItems(pictureDialogItems,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case 0:
+                                choosePhotoFromGallery();
+                                break;
+                            case 1:
+                                takePhotoFromCamera();
+                                break;
+                        }
+                    }
+                });
+        pictureDialog.show();
     }
 
     /**
@@ -219,7 +305,8 @@ public class ChangePhotoActivity extends AppCompatActivity implements EasyPermis
 
     @Override
     public void onPermissionsGranted(int requestCode, List<String> perms) {
-        showFileChooserIntent();
+//        showFileChooserIntent();
+        showPictureDialog();
     }
 
     @Override
@@ -293,9 +380,9 @@ public class ChangePhotoActivity extends AppCompatActivity implements EasyPermis
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                httpEntity = httpResponse.getEntity();
+//                httpEntity = httpResponse.getEntity();
 
-                responseJSON = EntityUtils.toString(httpResponse.getEntity());
+                responseJSON = EntityUtils.toString(httpResponse != null ? httpResponse.getEntity() : null);
 
                 /*int statusCode = httpResponse.getStatusLine().getStatusCode();
                 if (statusCode == 200) {
@@ -318,28 +405,42 @@ public class ChangePhotoActivity extends AppCompatActivity implements EasyPermis
 
         @Override
         protected void onPreExecute() {
-
-            // Init and show background_dialog
-            this.progressDialog = new ProgressDialog(this.context);
-            this.progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-            this.progressDialog.setCancelable(false);
-            this.progressDialog.show();
+                // Init and show background_dialog
+                this.progressDialog = new ProgressDialog(this.context);
+                this.progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                this.progressDialog.setCancelable(false);
+                this.progressDialog.show();
         }
+
 
         @Override
         protected void onPostExecute(String result) {
             // Close background_dialog
             this.progressDialog.dismiss();
+//            progressBarContainer.setVisibility(View.GONE);
             try {
                 JSONObject jsonObject = new JSONObject(result);
                 if (!jsonObject.getBoolean("error")) {
-                    Toast.makeText(ChangePhotoActivity.this, jsonObject.getString("message"),
-                            Toast.LENGTH_LONG).show();
+                    Toast toast = new Toast(getApplicationContext());
+                    View view = getLayoutInflater().inflate(R.layout.message, null);
+                    TextView textView = view.findViewById(R.id.message);
+                    textView.setText(jsonObject.getString("message"));
+                    toast.setView(view);
+                    int gravity = Gravity.BOTTOM;
+                    toast.setGravity(gravity, 10, 10);
+                    toast.show();
                     SharedPrefManager.getInstance(getApplicationContext())
                             .setUserImageLink(jsonObject.getString("user_image"));
 
                 } else {
-                    Toast.makeText(getApplicationContext(), jsonObject.getString("message"), Toast.LENGTH_LONG).show();
+                    Toast toast = new Toast(getApplicationContext());
+                    View view = getLayoutInflater().inflate(R.layout.warning, null);
+                    TextView textView = view.findViewById(R.id.message);
+                    textView.setText(jsonObject.getString("message"));
+                    toast.setView(view);
+                    int gravity = Gravity.BOTTOM;
+                    toast.setGravity(gravity, 10, 10);
+                    toast.show();
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -351,7 +452,37 @@ public class ChangePhotoActivity extends AppCompatActivity implements EasyPermis
         @Override
         protected void onProgressUpdate(Integer... progress) {
             // Update process
-            this.progressDialog.setProgress((int) progress[0]);
+            this.progressDialog.setProgress(progress[0]);
         }
+    }
+
+    private boolean hasActiveInternetConnection(Context context) {
+        if (isNetworkAvailable(context)) {
+            try {
+                HttpURLConnection urlc = (HttpURLConnection)
+                        (new URL("http://clients3.google.com/generate_204")
+                                .openConnection());
+                urlc.setRequestProperty("User-Agent", "Android");
+                urlc.setRequestProperty("Connection", "close");
+                urlc.setConnectTimeout(1500);
+                urlc.setRequestMethod("POST");
+                urlc.connect();
+                return (urlc.getResponseCode() == 204 &&
+                        urlc.getContentLength() == 0);
+            } catch (IOException e) {
+                Log.e("TAG", "Error checking internet connection", e);
+            }
+        } else {
+            Log.d("TAG", "No network available!");
+        }
+        return false;
+    }
+
+    private boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager
+                .getActiveNetworkInfo() : null;
+        return activeNetworkInfo != null;
     }
 }

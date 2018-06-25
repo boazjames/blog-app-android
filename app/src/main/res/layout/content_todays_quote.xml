@@ -39,7 +39,7 @@
                 android:layout_marginTop="10dp"
                 android:fontFamily="cursive"
                 android:text="body"
-                android:textColor="#FFF"
+                android:textColor="#000000"
                 android:textSize="18sp"
                 android:textStyle="italic" />
 
@@ -51,21 +51,43 @@
                 android:fontFamily="cursive"
                 android:gravity="right"
                 android:text="author"
-                android:textColor="#FFF" />
+                android:textColor="#000000" />
         </RelativeLayout>
     </RelativeLayout>
 
-    <TextView
+    <RelativeLayout
         android:id="@+id/fetch_error"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="200dp"
-        android:gravity="center_horizontal"
-        android:text="@string/error_fetch_quote"
-        android:textColor="#000"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:visibility="gone" />
+        android:layout_height="match_parent"
+        android:background="@color/seafoam"
+        android:visibility="gone">
+        <ImageView
+            android:id="@id/imageView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="100dp"
+            android:tint="@color/ocean"
+            android:src="@drawable/baseline_signal_cellular_connected_no_internet_4_bar_white_24dp"/>
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/imageView"
+            android:padding="10dp"
+            android:gravity="center"
+            android:text="@string/error_fetch_quote"
+            android:textColor="#000"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+        <ImageView
+            android:id="@+id/refresh"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_below="@id/textView"
+            android:layout_centerHorizontal="true"
+            android:tint="@color/ocean"
+            android:src="@drawable/baseline_refresh_white_48dp"/>
+    </RelativeLayout>
 
 </RelativeLayout>

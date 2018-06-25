@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -63,9 +64,14 @@ public class LoginActivity extends AppCompatActivity {
                         final String username = editTextUsername.getText().toString().trim();
                         final String password = editTextPassword.getText().toString().trim();
                         if(username.length() == 0 || password.length() == 0){
-                            Toast.makeText(getApplicationContext(),
-                                    "username/email or password field is empty",
-                                    Toast.LENGTH_LONG).show();
+                            Toast toast = new Toast(getApplicationContext());
+                            View view = getLayoutInflater().inflate(R.layout.empty_field, null);
+                            toast.setView(view);
+                            toast.setDuration(Toast.LENGTH_LONG);
+                            int gravity = Gravity.BOTTOM;
+
+                            toast.setGravity(gravity, 10, 10);
+                            toast.show();
                         }else{
                             userLogin(username, password);
                         }
@@ -94,9 +100,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void userLogin(final String username, final String password){
-
-//        progressDialog.setMessage("verifying your details");
-//        progressDialog.show();
         progressBarContainer.setVisibility(View.VISIBLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
@@ -107,7 +110,6 @@ public class LoginActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-//                        progressDialog.hide();
                         progressBarContainer.setVisibility(View.GONE);
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
@@ -125,7 +127,14 @@ public class LoginActivity extends AppCompatActivity {
                                 startActivity(new Intent(getApplicationContext(), HomeActivity.class));
                                 finish();
                             }else {
-                                Toast.makeText(getApplicationContext(), jsonObject.getString("message"), Toast.LENGTH_LONG).show();
+                                Toast toast = new Toast(getApplicationContext());
+                                View view = getLayoutInflater().inflate(R.layout.warning, null);
+                                TextView textview =  view.findViewById(R.id.message);
+                                textview.setText(jsonObject.getString("message"));
+                                toast.setView(view);
+                                int gravity = Gravity.BOTTOM;
+                                toast.setGravity(gravity, 10, 10);
+                                toast.show();
 
                             }
                         } catch (JSONException e) {
@@ -138,8 +147,15 @@ public class LoginActivity extends AppCompatActivity {
                     public void onErrorResponse(VolleyError error) {
                         progressBarContainer.setVisibility(View.GONE);
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                        Toast.makeText(getApplicationContext(),
-                                "Network error please try again.", Toast.LENGTH_LONG).show();
+
+                        Toast toast = new Toast(getApplicationContext());
+                        View view = getLayoutInflater().inflate(R.layout.network_error, null);
+                        toast.setView(view);
+                        toast.setDuration(Toast.LENGTH_LONG);
+                        int gravity = Gravity.BOTTOM;
+
+                        toast.setGravity(gravity, 10, 10);
+                        toast.show();
                     }
                 }
         ){

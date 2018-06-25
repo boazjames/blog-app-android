@@ -27,4 +27,7 @@
         <include layout="@layout/content_change_photo" />
     </RelativeLayout>
 
+    <include layout="@layout/progress_bar"
+        android:visibility="gone"/>
+
 </android.support.design.widget.CoordinatorLayout>
