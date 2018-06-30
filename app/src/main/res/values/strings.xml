@@ -159,6 +159,7 @@
     <string name="or">OR</string>
     <string name="chose_an_image">Chose an image</string>
     <string name="read_file">This app needs access to your file storage so that it can read files.</string>
+    <string name="save_file">This app needs access to your file storage so that it can save files.</string>
     <string name="choose_file">Choose File</string>
     <string name="upload">Upload</string>
     <string name="file_name">File Name</string>
@@ -171,6 +172,10 @@
     <string name="no_post">Sorry, there is no such post. Try a different search term.</string>
     <string name="error_fetch_post">
         Sorry, there was an error while fetching the posts.
+        Please check your internet connection.
+    </string>
+    <string name="error_fetch_memes">
+        Sorry, there was an error while fetching memes.
         Please check your internet connection.
     </string>
     <string name="no_video">Sorry, there is no such video. Try a different search term.</string>
@@ -205,4 +210,17 @@
     <string name="empty_field_username_password">Please fill all required field.</string>
     <string name="no_file">Please select an image first</string>
     <string name="warning_bg_data">Do not RESTRICT BACKGROUND DATA</string>
+    <string name="memes">Memes</string>
+    <string name="download">Download</string>
+    <string name="less_characters">Please enter at least 3 characters</string>
+    <string name="empty_email_field">Email field is empty</string>
+    <string name="invalid_email">Invalid email address</string>
+    <string name="password_length_short">Password length must be at least 8 characters</string>
+    <string name="password_mismatch">Password does not match</string>
+    <string name="password_reset_success">Password reset successful</string>
+    <string name="code_short">Code too short</string>
+    <string name="activate_sucess">Account successfully activated</string>
+    <string name="no_memes">No more Memes</string>
+    <string name="first_meme">This is the first Meme</string>
+    <string name="permission_denied">Permissions Denied</string>
 </resources>

@@ -5,12 +5,14 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -56,7 +58,29 @@ public class SendCodeActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
                         String email = editTextEmail.getText().toString().trim();
-                        sendCode(email);
+                        if(email.length() != 0) {
+                            if(Helpers.isValidEmail(email)) {
+                                sendCode(email);
+                            } else {
+                                Toast toast = new Toast(getApplicationContext());
+                                View view1 = getLayoutInflater().inflate(R.layout.warning, null);
+                                TextView textView = view1.findViewById(R.id.message);
+                                textView.setText(R.string.invalid_email);
+                                toast.setView(view1);
+                                int gravity = Gravity.BOTTOM;
+                                toast.setGravity(gravity, 10, 10);
+                                toast.show();
+                            }
+                        } else {
+                            Toast toast = new Toast(getApplicationContext());
+                            View view1 = getLayoutInflater().inflate(R.layout.warning, null);
+                            TextView textView = view1.findViewById(R.id.message);
+                            textView.setText(R.string.empty_email_field);
+                            toast.setView(view1);
+                            int gravity = Gravity.BOTTOM;
+                            toast.setGravity(gravity, 10, 10);
+                            toast.show();
+                        }
                     }
                 }
         );
@@ -94,14 +118,26 @@ public class SendCodeActivity extends AppCompatActivity {
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             if (!jsonObject.getBoolean("error")) {
-                                Toast.makeText(getApplicationContext(), jsonObject.getString("message"),
-                                        Toast.LENGTH_LONG).show();
+                                Toast toast = new Toast(getApplicationContext());
+                                View view1 = getLayoutInflater().inflate(R.layout.message, null);
+                                TextView textView = view1.findViewById(R.id.message);
+                                textView.setText(jsonObject.getString("message"));
+                                toast.setView(view1);
+                                int gravity = Gravity.BOTTOM;
+                                toast.setGravity(gravity, 10, 10);
+                                toast.show();
                                 Intent intent = new Intent(getApplicationContext(), VerifyResetCodeActivity.class);
                                 intent.putExtra("email", jsonObject.getString("email"));
                                 startActivity(intent);
                             } else {
-                                Toast.makeText(getApplicationContext(), jsonObject.getString("message"), Toast.LENGTH_LONG).show();
-                            }
+                                Toast toast = new Toast(getApplicationContext());
+                                View view1 = getLayoutInflater().inflate(R.layout.warning, null);
+                                TextView textView = view1.findViewById(R.id.message);
+                                textView.setText(jsonObject.getString("message"));
+                                toast.setView(view1);
+                                int gravity = Gravity.BOTTOM;
+                                toast.setGravity(gravity, 10, 10);
+                                toast.show();                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -114,8 +150,12 @@ public class SendCodeActivity extends AppCompatActivity {
                         progressBarContainer.setVisibility(View.GONE);
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
-                        Toast.makeText(getApplicationContext(),
-                                "Network error please try again.", Toast.LENGTH_LONG).show();
+                        Toast toast = new Toast(getApplicationContext());
+                        View view1 = getLayoutInflater().inflate(R.layout.network_error, null);
+                        toast.setView(view1);
+                        int gravity = Gravity.BOTTOM;
+                        toast.setGravity(gravity, 10, 10);
+                        toast.show();
                     }
                 }
         ) {

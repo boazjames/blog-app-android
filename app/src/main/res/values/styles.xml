@@ -5,7 +5,7 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/colorWhite</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
@@ -32,9 +32,13 @@
 
         <!-- Overflow -->
         <item name="android:textColorSecondary">@android:color/white</item>
+
+        <item name="overlapAnchor">false</item>
+
         <!-- This will change drawer icon -->
         <item name="drawerArrowStyle">@style/WhiteDrawerIconStyle</item>
-        <!-- background of the  -->
+
+        <!-- background -->
         <item name="android:background">@color/ocean</item>
     </style>
 
@@ -62,11 +66,6 @@
 
     <style name="LinearProgress" parent="Theme.AppCompat.Light">
         <item name="colorAccent">@color/ocean</item>
-    </style>
-
-    <style name="SnackbarTheme" parent="Theme.AppCompat.Light">
-        <item name="colorAccent">@color/deep_aqua</item>
-        <item name="android:textColor">@android:color/white</item>
     </style>
 
 </resources>

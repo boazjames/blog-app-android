@@ -36,9 +36,9 @@ public class LauncherActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 finish();
-                overridePendingTransition( 0, 0);
+                overridePendingTransition(0, 0);
                 startActivity(getIntent());
-                overridePendingTransition( 0, 0);
+                overridePendingTransition(0, 0);
             }
         });
 
@@ -59,19 +59,17 @@ public class LauncherActivity extends AppCompatActivity {
         // change snackbar background
         snackbarView.setBackgroundColor(getResources().getColor(R.color.deep_aqua));
 
-        if (helpers.isConnectedToInternet()) {
-            if (SharedPrefManager.getInstance(this).isFirstTimeLaunch()) {
-                finish();
-                startActivity(new Intent(this, WelcomeActivity.class));
-            } else {
-                finish();
-                startActivity(new Intent(this, LoginActivity.class));
-            }
+        if (SharedPrefManager.getInstance(this).isFirstTimeLaunch()) {
+            finish();
+            startActivity(new Intent(this, WelcomeActivity.class));
         } else {
-            // create instance
+            if (helpers.isConnectedToInternet()) {
+                    finish();
+                    startActivity(new Intent(this, LoginActivity.class));
+            } else {
+                snackbar.show();
 
-            snackbar.show();
-
+            }
         }
 
         merlin.registerConnectable(new Connectable() {

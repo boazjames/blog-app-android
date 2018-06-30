@@ -1,8 +1,20 @@
 package com.kiddnation254.kiddnation254;
 
-import android.app.ProgressDialog;
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.DownloadManager;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
@@ -12,12 +24,18 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -29,45 +47,48 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class TodaysQuoteActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+import java.util.ArrayList;
+import java.util.List;
 
-    private ImageView imageViewUser, refresh;
-    private TextView textViewUsername, textViewFetchError;
-    private String path;
-    private TextView quoteBody, quoteAuothor;
-    private ProgressDialog progressDialog;
-    private String userImgLink;
-    private RelativeLayout relativeLayoutContainer;
-    private RelativeLayout progressBarContainer, fetchError;
+import pub.devrel.easypermissions.EasyPermissions;
 
+public class MemeActivity extends AppCompatActivity implements
+        NavigationView.OnNavigationItemSelectedListener {
+
+    private ImageView imageViewUser, refresh, memeImage;
+    private TextView textViewUsername;
+    private RelativeLayout progressBarContainer, fetch_error;
+    private String userImgLink, path;
+    private List<String> links = new ArrayList<>();
+    private StoreStart storeStart;
+    private Boolean fullScreen = false;
+    private MenuItem menuItem;
+    private DownloadManager downloadManager;
+
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_todays_quote);
+        setContentView(R.layout.activity_meme);
+
+        downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
 
         progressBarContainer = (RelativeLayout) findViewById(R.id.progress_bar_container);
         progressBarContainer.setVisibility(View.GONE);
 
-        progressDialog = new ProgressDialog(this);
-        quoteBody = (TextView) findViewById(R.id.quoteBody);
-        quoteAuothor = (TextView) findViewById(R.id.quoteAuthor);
-        fetchError = (RelativeLayout) findViewById(R.id.fetch_error);
-        relativeLayoutContainer = (RelativeLayout) findViewById(R.id.relativeLayoutContainer);
+        fetch_error = (RelativeLayout) findViewById(R.id.fetch_error);
         refresh = (ImageView) findViewById(R.id.refresh);
+        memeImage = findViewById(R.id.memeImage);
 
-        fetchError.setVisibility(View.GONE);
-        relativeLayoutContainer.setVisibility(View.GONE);
-
-        showQuote();
+        fetch_error.setVisibility(View.GONE);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        getSupportActionBar().setTitle("Today's Quote");
+        getSupportActionBar().setTitle("Memes");
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -78,9 +99,9 @@ public class TodaysQuoteActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.bottomNavigation);
+        final BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.bottomNavigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        navigation.getMenu().getItem(2).setChecked(true);
+        navigation.getMenu().getItem(3).setChecked(true);
 
         View header = navigationView.getHeaderView(0);
         textViewUsername = (TextView) header.findViewById(R.id.textViewUsername);
@@ -90,18 +111,67 @@ public class TodaysQuoteActivity extends AppCompatActivity
         userImgLink = SharedPrefManager.getInstance(getApplicationContext()).getUserImageLink();
         path = Constants.URL_USER_IMG;
 
+        showMemes();
+        memeImage.setOnTouchListener(new OnSwipeTouchListener(this) {
+            public void onSwipeLeft() {
+                if (!links.isEmpty()) {
+                    if (storeStart.getStart() < links.size() - 1) {
+                        Picasso.with(getApplicationContext())
+                                .load(Constants.MEME_URL + links.get(storeStart.getStart()
+                                        + 1))
+                                .placeholder(R.drawable.meme_placeholder)
+                                .error(R.drawable.meme_placeholder)
+                                .fit()
+                                .into(memeImage);
+                        storeStart.setStart(storeStart.getStart() + 1);
+                    } else {
+                        Toast toast = new Toast(getApplicationContext());
+                        View view = getLayoutInflater().inflate(R.layout.message, null);
+                        TextView textView = view.findViewById(R.id.message);
+                        textView.setText(R.string.no_memes);
+                        toast.setView(view);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                    }
+                }
+            }
+
+            public void onSwipeRight() {
+                if (!links.isEmpty()) {
+                    if (storeStart.getStart() > 0) {
+                        Picasso.with(getApplicationContext())
+                                .load(Constants.MEME_URL + links.get(storeStart.getStart()
+                                        - 1))
+                                .placeholder(R.drawable.meme_placeholder)
+                                .error(R.drawable.meme_placeholder)
+                                .fit()
+                                .into(memeImage);
+                        storeStart.setStart(storeStart.getStart() - 1);
+                    } else {
+                        Toast toast = new Toast(getApplicationContext());
+                        View view = getLayoutInflater().inflate(R.layout.message, null);
+                        TextView textView = view.findViewById(R.id.message);
+                        textView.setText(R.string.first_meme);
+                        toast.setView(view);
+                        toast.setGravity(Gravity.CENTER, 0, 0);
+                        toast.show();
+                    }
+                }
+            }
+
+        });
+
         refresh.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         finish();
-                        overridePendingTransition( 0, 0);
+                        overridePendingTransition(0, 0);
                         startActivity(getIntent());
-                        overridePendingTransition( 0, 0);
+                        overridePendingTransition(0, 0);
                     }
                 }
         );
-
     }
 
     @Override
@@ -116,6 +186,51 @@ public class TodaysQuoteActivity extends AppCompatActivity
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_download, menu);
+        menuItem = menu.findItem(R.id.action_download);
+        menuItem.setEnabled(false);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_download) {
+            if (EasyPermissions.hasPermissions(getApplicationContext(), Manifest.permission
+                    .WRITE_EXTERNAL_STORAGE)) {
+                try {
+                    Uri uri = Uri.parse(Constants.MEME_URL + links.get(storeStart.getStart()));
+                    DownloadManager.Request request = new DownloadManager.Request(uri);
+
+                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
+                            "KiddNation254_" + System.currentTimeMillis());
+
+                    request.setNotificationVisibility(DownloadManager.Request
+                            .VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                    Long reference = downloadManager.enqueue(request);
+                } catch (IllegalStateException e) {
+                    Toast toast = new Toast(getApplicationContext());
+                    View view = getLayoutInflater().inflate(R.layout.message, null);
+                    TextView textView = view.findViewById(R.id.message);
+                    textView.setText(R.string.permission_denied);
+                    toast.setView(view);
+                    toast.setGravity(Gravity.BOTTOM, 30, 30);
+                    toast.show();
+                }
+            } else {
+                //If permission is not present request for the same.
+                EasyPermissions.requestPermissions(getApplicationContext(),
+                        getString(R.string.save_file), 300, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            }
+
+        }
+
+
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     public void onBackPressed() {
@@ -148,21 +263,6 @@ public class TodaysQuoteActivity extends AppCompatActivity
             AlertDialog alertDialog = alertDialogBuilder.create();
             alertDialog.show();
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_about) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -239,59 +339,58 @@ public class TodaysQuoteActivity extends AppCompatActivity
         }
     };
 
-    public void showQuote() {
-        progressBarContainer.setVisibility(View.VISIBLE);
+    private void showMemes() {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        progressBarContainer.setVisibility(View.VISIBLE);
 
         StringRequest stringRequest = new StringRequest(
-                Request.Method.GET,
-                Constants.URL_SHOW_TODAYS_QUOTE,
+                Request.Method.GET, Constants.URL_SHOW_MEMES,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        progressBarContainer.setVisibility(View.GONE);
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-
-
+                        progressBarContainer.setVisibility(View.GONE);
                         try {
-                            final JSONObject jsonObject = new JSONObject(response);
-
+                            JSONObject jsonObject = new JSONObject(response);
                             if (!jsonObject.getBoolean("error")) {
+                                JSONArray jsonArray = jsonObject.getJSONArray("links");
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    links.add(jsonArray.getString(i));
+                                }
+                                storeStart = new StoreStart(0);
 
-                                Quote quote = new Quote(jsonObject.getInt("id"), jsonObject.getString("body"),
-                                        "-" + jsonObject.getString("author"));
-
-                                quoteBody.setText(quote.getQuoteBody());
-                                quoteAuothor.setText(quote.getQuoteAuthor());
-                                relativeLayoutContainer.setVisibility(View.VISIBLE);
-
+                                Picasso.with(getApplicationContext())
+                                        .load(Constants.MEME_URL + links.get(0))
+                                        .placeholder(R.drawable.meme_placeholder)
+                                        .error(R.drawable.meme_placeholder)
+                                        .fit()
+                                        .into(memeImage);
+                                menuItem.setEnabled(true);
                             } else {
                                 Toast toast = new Toast(getApplicationContext());
+                                toast.setDuration(Toast.LENGTH_LONG);
                                 View view = getLayoutInflater().inflate(R.layout.warning, null);
-                                TextView textView = view.findViewById(R.id.message);
-                                textView.setText(jsonObject.getString("message"));
+                                TextView textview = view.findViewById(R.id.message);
+                                textview.setText(jsonObject.getString("message"));
                                 toast.setView(view);
-                                int gravity = Gravity.BOTTOM;
-                                toast.setGravity(gravity, 10, 10);
+                                toast.setGravity(Gravity.BOTTOM, 10, 10);
                                 toast.show();
                             }
                         } catch (JSONException e) {
-                            e.printStackTrace();
+//                            e.printStackTrace();
                         }
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        progressBarContainer.setVisibility(View.GONE);
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-                        fetchError.setVisibility(View.VISIBLE);
-                        relativeLayoutContainer.setVisibility(View.GONE);
+                        progressBarContainer.setVisibility(View.GONE);
+                        fetch_error.setVisibility(View.VISIBLE);
                     }
                 }
         );
-
-        RequestHandler.getInstance(this).addToRequestQueue(stringRequest);
+        RequestHandler.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);
     }
 }

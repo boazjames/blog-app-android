@@ -16,4 +16,9 @@
         android:icon="@drawable/baseline_comment_white_48dp_2x"
         android:title="@string/quotes_text" />
 
+    <item
+        android:id="@+id/navigation_memes"
+        android:icon="@drawable/baseline_wallpaper_white_24dp"
+        android:title="@string/memes" />
+
 </menu>

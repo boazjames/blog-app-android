@@ -200,8 +200,14 @@ public class HomeActivity extends AppCompatActivity
             public boolean onQueryTextSubmit(String query) {
                 String searchTerm = searchView.getQuery().toString();
                 if (searchTerm.length() < 3) {
-                    Toast.makeText(getApplicationContext(),
-                            "Please enter at least 3 characters", Toast.LENGTH_LONG).show();
+                    Toast toast = new Toast(getApplicationContext());
+                    View view = getLayoutInflater().inflate(R.layout.warning, null);
+                    TextView textView = view.findViewById(R.id.message);
+                    textView.setText(R.string.less_characters);
+                    toast.setView(view);
+                    int gravity = Gravity.BOTTOM;
+                    toast.setGravity(gravity, 10, 10);
+                    toast.show();
                 } else {
                     searchFewPosts(searchTerm);
                     storeSearchTerm = new StoreSearchTerm(searchTerm);
@@ -250,21 +256,6 @@ public class HomeActivity extends AppCompatActivity
             AlertDialog alertDialog = alertDialogBuilder.create();
             alertDialog.show();
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_about) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -330,6 +321,10 @@ public class HomeActivity extends AppCompatActivity
                     return true;
                 case R.id.navigation_quotes:
                     startActivity(new Intent(getApplicationContext(), TodaysQuoteActivity.class));
+                    finish();
+                    return true;
+                case R.id.navigation_memes:
+                    startActivity(new Intent(getApplicationContext(), MemeActivity.class));
                     finish();
                     return true;
             }

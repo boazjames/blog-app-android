@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="10dp"
+        android:layout_marginBottom="130dp">
+        <ImageView
+            android:id="@+id/memeImage"
+            android:layout_alignParentTop="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/fetch_error"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/seafoam"
+        android:visibility="gone">
+        <ImageView
+            android:id="@id/imageView"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="100dp"
+            android:tint="@color/ocean"
+            android:src="@drawable/baseline_signal_cellular_connected_no_internet_4_bar_white_24dp"/>
+        <TextView
+            android:id="@id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/imageView"
+            android:padding="10dp"
+            android:gravity="center"
+            android:text="@string/error_fetch_memes"
+            android:textColor="#000"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <ImageView
+            android:id="@+id/refresh"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_below="@id/textView"
+            android:layout_centerHorizontal="true"
+            android:tint="@color/ocean"
+            android:src="@drawable/baseline_refresh_white_48dp"/>
+    </RelativeLayout>
+</RelativeLayout>

@@ -308,6 +308,10 @@ public class VideosActivity extends AppCompatActivity
                     startActivity(new Intent(getApplicationContext(), TodaysQuoteActivity.class));
                     finish();
                     return true;
+                case R.id.navigation_memes:
+                    startActivity(new Intent(getApplicationContext(), MemeActivity.class));
+                    finish();
+                    return true;
             }
             return false;
         }

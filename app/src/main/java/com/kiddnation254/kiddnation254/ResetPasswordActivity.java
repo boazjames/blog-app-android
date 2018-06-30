@@ -5,12 +5,14 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -66,13 +68,23 @@ public class ResetPasswordActivity extends AppCompatActivity {
                         String password = editTextPassword.getText().toString().trim();
                         String confirm_password = editTextConfirm_password.getText().toString().trim();
                         if (password.length() < 8) {
-                            Toast.makeText(getApplicationContext(),
-                                    "Password length must be at least 8 characters",
-                                    Toast.LENGTH_LONG).show();
-
+                            Toast toast = new Toast(getApplicationContext());
+                            View view1 = getLayoutInflater().inflate(R.layout.warning, null);
+                            TextView textView = view1.findViewById(R.id.message);
+                            textView.setText(R.string.password_length_short);
+                            toast.setView(view1);
+                            int gravity = Gravity.BOTTOM;
+                            toast.setGravity(gravity, 10, 10);
+                            toast.show();
                         } else if (!password.equals(confirm_password)) {
-                            Toast.makeText(getApplicationContext(), "Password does not match",
-                                    Toast.LENGTH_LONG).show();
+                            Toast toast = new Toast(getApplicationContext());
+                            View view1 = getLayoutInflater().inflate(R.layout.warning, null);
+                            TextView textView = view1.findViewById(R.id.message);
+                            textView.setText(R.string.password_mismatch);
+                            toast.setView(view1);
+                            int gravity = Gravity.BOTTOM;
+                            toast.setGravity(gravity, 10, 10);
+                            toast.show();
                         } else {
                             resetPassword(password, email);
                         }
@@ -121,6 +133,14 @@ public class ResetPasswordActivity extends AppCompatActivity {
                                                 jsonObject.getString("phone"),
                                                 jsonObject.getString("image_link")
                                         );
+                                Toast toast = new Toast(getApplicationContext());
+                                View view1 = getLayoutInflater().inflate(R.layout.message, null);
+                                TextView textView = view1.findViewById(R.id.message);
+                                textView.setText(R.string.password_reset_success);
+                                toast.setView(view1);
+                                int gravity = Gravity.BOTTOM;
+                                toast.setGravity(gravity, 10, 10);
+                                toast.show();
                                 startActivity(new Intent(getApplicationContext(), HomeActivity.class));
                                 finish();
                             } else {
@@ -138,8 +158,12 @@ public class ResetPasswordActivity extends AppCompatActivity {
                         progressBarContainer.setVisibility(View.GONE);
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
-                        Toast.makeText(getApplicationContext(),
-                                "Network error please try again.", Toast.LENGTH_LONG).show();
+                        Toast toast = new Toast(getApplicationContext());
+                        View view1 = getLayoutInflater().inflate(R.layout.network_error, null);
+                        toast.setView(view1);
+                        int gravity = Gravity.BOTTOM;
+                        toast.setGravity(gravity, 10, 10);
+                        toast.show();
                     }
                 }
         ) {
