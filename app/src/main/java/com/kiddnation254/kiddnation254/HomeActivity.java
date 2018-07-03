@@ -15,6 +15,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.text.Html;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -70,7 +71,9 @@ public class HomeActivity extends AppCompatActivity
     private String userImgLink;
     private StoreSearchTerm storeSearchTerm;
     private RelativeLayout recycleViewContainer;
-    private RelativeLayout progressBarContainer, fetch_error;
+    private RelativeLayout progressBarContainer, fetch_error, progressBarContainerMore;
+    private NestedScrollView nestedScrollView;
+    private OperationRunning operationRunning;
 
 
     @Override
@@ -79,8 +82,12 @@ public class HomeActivity extends AppCompatActivity
         setContentView(R.layout.activity_home);
 
         limit = "5";
+        storeSearchTerm = new StoreSearchTerm(null);
+        operationRunning = new OperationRunning(false);
 
         progressBarContainer = (RelativeLayout) findViewById(R.id.progress_bar_container);
+        progressBarContainerMore = (RelativeLayout) findViewById(R.id.progress_bar_container_more);
+        progressBarContainerMore.setVisibility(View.GONE);
         progressBarContainer.setVisibility(View.GONE);
 
         progressDialog = new ProgressDialog(this);
@@ -89,10 +96,12 @@ public class HomeActivity extends AppCompatActivity
         recycleViewContainer = (RelativeLayout) findViewById(R.id.recycler_view_container);
         fetch_error = (RelativeLayout) findViewById(R.id.fetch_error);
         refresh = (ImageView) findViewById(R.id.refresh);
+        nestedScrollView = findViewById(R.id.nestedScrollView);
 
         recycleViewContainer.setVisibility(View.GONE);
         fetch_error.setVisibility(View.GONE);
-
+        showMorePostsButton.setVisibility(View.GONE);
+        showMoreSearchPostsButton.setVisibility(View.GONE);
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         layoutManager = new LinearLayoutManager(this);
@@ -131,7 +140,7 @@ public class HomeActivity extends AppCompatActivity
         path = Constants.URL_USER_IMG;
 
 
-        showMorePostsButton.setOnClickListener(
+        /*showMorePostsButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -147,19 +156,46 @@ public class HomeActivity extends AppCompatActivity
                         searchMorePosts(storeSearchTerm.getSearchTerm(), storeNextStart.getStart());
                     }
                 }
-        );
+        );*/
 
         refresh.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         finish();
-                        overridePendingTransition( 0, 0);
+                        overridePendingTransition(0, 0);
                         startActivity(getIntent());
-                        overridePendingTransition( 0, 0);
+                        overridePendingTransition(0, 0);
                     }
                 }
         );
+
+        nestedScrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+
+                /*if (scrollY > oldScrollY) {
+                    Log.i("TAG", "Scroll DOWN");
+                }
+                if (scrollY < oldScrollY) {
+                    Log.i("", "Scroll UP");
+                }
+
+                if (scrollY == 0) {
+                    Log.i("TAG", "TOP SCROLL");
+                }*/
+                if (!operationRunning.getRunning()) {
+
+                    if (scrollY == (v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight())) {
+                        if (storeSearchTerm.getSearchTerm() == null) {
+                            showMorePosts(storeNextStart.getStart());
+                        } else {
+                            searchMorePosts(storeSearchTerm.getSearchTerm(), storeNextStart.getStart());
+                        }
+                    }
+                }
+            }
+        });
 
     }
 
@@ -206,11 +242,11 @@ public class HomeActivity extends AppCompatActivity
                     textView.setText(R.string.less_characters);
                     toast.setView(view);
                     int gravity = Gravity.BOTTOM;
-                    toast.setGravity(gravity, 10, 10);
+                    toast.setGravity(gravity, 90, 90);
                     toast.show();
                 } else {
                     searchFewPosts(searchTerm);
-                    storeSearchTerm = new StoreSearchTerm(searchTerm);
+                    storeSearchTerm.setSearchTerm(searchTerm);
                 }
                 return false;
             }
@@ -357,9 +393,9 @@ public class HomeActivity extends AppCompatActivity
                                     JSONObject data = jsonObject.getJSONObject("data");
                                     Iterator<?> keys = data.keys();
 
-                                    if (total < 6) {
+                                    /*if (total < 6) {
                                         showMorePostsButton.setVisibility(View.GONE);
-                                    }
+                                    }*/
 
                                     while (keys.hasNext()) {
                                         String key = (String) keys.next();
@@ -386,7 +422,7 @@ public class HomeActivity extends AppCompatActivity
                                     adapter.notifyDataSetChanged();
 
                                 } else {
-                                    showMorePostsButton.setVisibility(View.GONE);
+//                                    showMorePostsButton.setVisibility(View.GONE);
                                 }
                             } else {
                                 recycleViewContainer.setVisibility(View.GONE);
@@ -397,7 +433,7 @@ public class HomeActivity extends AppCompatActivity
                                 textView.setText(jsonObject.getString("message"));
                                 toast.setView(view);
                                 int gravity = Gravity.BOTTOM;
-                                toast.setGravity(gravity, 10, 10);
+                                toast.setGravity(gravity, 90, 90);
                                 toast.show();
 
                             }
@@ -422,22 +458,25 @@ public class HomeActivity extends AppCompatActivity
     }
 
     public void showMorePosts(int start) {
+        operationRunning.setRunning(true);
+        progressBarContainerMore.setVisibility(View.VISIBLE);
         StringRequest stringRequest = new StringRequest(
                 Request.Method.GET,
                 Constants.URL_SHOW_POSTS + "?limit=" + limit + "&start=" + start,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-
+                        operationRunning.setRunning(false);
+                        progressBarContainerMore.setVisibility(View.GONE);
                         try {
                             JSONObject jsonObject = new JSONObject(response);
 
                             if (!jsonObject.getBoolean("error")) {
                                 storeNextStart.setStart(jsonObject.getInt("next_start"));
 
-                                if (storeNextStart.getStart() >= jsonObject.getInt("total")) {
+                                /*if (storeNextStart.getStart() >= jsonObject.getInt("total")) {
                                     showMorePostsButton.setVisibility(View.GONE);
-                                }
+                                }*/
 
                                 total = jsonObject.getInt("total");
                                 JSONObject data = jsonObject.getJSONObject("data");
@@ -445,9 +484,9 @@ public class HomeActivity extends AppCompatActivity
 
                                 List<Post> postListNew = new ArrayList<>();
 
-                                if (total < 6) {
+                                /*if (total < 6) {
                                     showMorePostsButton.setVisibility(View.GONE);
-                                }
+                                }*/
 
                                 while (keys.hasNext()) {
                                     String key = (String) keys.next();
@@ -485,7 +524,7 @@ public class HomeActivity extends AppCompatActivity
                                 textView.setText(jsonObject.getString("message"));
                                 toast.setView(view);
                                 int gravity = Gravity.BOTTOM;
-                                toast.setGravity(gravity, 10, 10);
+                                toast.setGravity(gravity, 90, 90);
                                 toast.show();
 
                             }
@@ -497,11 +536,13 @@ public class HomeActivity extends AppCompatActivity
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        operationRunning.setRunning(false);
+                        progressBarContainerMore.setVisibility(View.GONE);
                         Toast toast = new Toast(getApplicationContext());
                         View view = getLayoutInflater().inflate(R.layout.network_error, null);
                         toast.setView(view);
                         int gravity = Gravity.BOTTOM;
-                        toast.setGravity(gravity, 10, 10);
+                        toast.setGravity(gravity, 90, 90);
                         toast.show();
                     }
                 }
@@ -539,27 +580,23 @@ public class HomeActivity extends AppCompatActivity
                         progressBarContainer.setVisibility(View.GONE);
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
-                        postList.clear();
-                        adapter.notifyDataSetChanged();
-
                         try {
                             JSONObject jsonObject = new JSONObject(response);
 
                             if (!jsonObject.getBoolean("error")) {
                                 if (!jsonObject.getBoolean("noData")) {
+                                    postList.clear();
+                                    adapter.notifyDataSetChanged();
+
                                     recycleViewContainer.setVisibility(View.VISIBLE);
-                                    textViewNoPost.setVisibility(View.GONE);
-                                    textViewFetchError.setVisibility(View.GONE);
-                                    showMorePostsButton.setVisibility(View.GONE);
-                                    showMoreSearchPostsButton.setVisibility(View.VISIBLE);
                                     storeNextStart = new StoreNextStart(jsonObject.getInt("next_start"));
                                     total = jsonObject.getInt("total");
                                     JSONObject data = jsonObject.getJSONObject("data");
                                     Iterator<?> keys = data.keys();
 
-                                    if (total < 6) {
+                                    /*if (total < 6) {
                                         showMoreSearchPostsButton.setVisibility(View.GONE);
-                                    }
+                                    }*/
 
                                     while (keys.hasNext()) {
                                         String key = (String) keys.next();
@@ -596,7 +633,7 @@ public class HomeActivity extends AppCompatActivity
                                     textView.setText(R.string.no_post);
                                     toast.setView(view);
                                     int gravity = Gravity.BOTTOM;
-                                    toast.setGravity(gravity, 10, 10);
+                                    toast.setGravity(gravity, 90, 90);
                                     toast.show();
                                 }
                             } else {
@@ -606,7 +643,7 @@ public class HomeActivity extends AppCompatActivity
                                 textView.setText(jsonObject.getString("message"));
                                 toast.setView(view);
                                 int gravity = Gravity.BOTTOM;
-                                toast.setGravity(gravity, 10, 10);
+                                toast.setGravity(gravity, 90, 90);
                                 toast.show();
 
                             }
@@ -636,7 +673,7 @@ public class HomeActivity extends AppCompatActivity
                         toast.setView(view);
                         toast.setDuration(Toast.LENGTH_LONG);
                         int gravity = Gravity.BOTTOM;
-                        toast.setGravity(gravity, 10, 10);
+                        toast.setGravity(gravity, 90, 90);
                         toast.show();
                     }
                 }
@@ -646,12 +683,16 @@ public class HomeActivity extends AppCompatActivity
     }
 
     public void searchMorePosts(String search_term, int start) {
+        operationRunning.setRunning(true);
+        progressBarContainerMore.setVisibility(View.VISIBLE);
         StringRequest stringRequest = new StringRequest(
                 Request.Method.GET,
                 Constants.URL_SEARCH_POSTS + "?limit=" + limit + "&start=" + start + "&search_term=" + search_term,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        operationRunning.setRunning(false);
+                        progressBarContainerMore.setVisibility(View.GONE);
 
                         try {
                             JSONObject jsonObject = new JSONObject(response);
@@ -659,9 +700,9 @@ public class HomeActivity extends AppCompatActivity
                             if (!jsonObject.getBoolean("error")) {
                                 storeNextStart.setStart(jsonObject.getInt("next_start"));
 
-                                if (storeNextStart.getStart() >= jsonObject.getInt("total")) {
+                                /*if (storeNextStart.getStart() >= jsonObject.getInt("total")) {
                                     showMoreSearchPostsButton.setVisibility(View.GONE);
-                                }
+                                }*/
 
                                 total = jsonObject.getInt("total");
                                 JSONObject data = jsonObject.getJSONObject("data");
@@ -669,9 +710,9 @@ public class HomeActivity extends AppCompatActivity
 
                                 List<Post> postListNew = new ArrayList<>();
 
-                                if (total < 6) {
+                                /*if (total < 6) {
                                     showMoreSearchPostsButton.setVisibility(View.GONE);
-                                }
+                                }*/
 
                                 while (keys.hasNext()) {
                                     String key = (String) keys.next();
@@ -709,7 +750,7 @@ public class HomeActivity extends AppCompatActivity
                                 textView.setText(jsonObject.getString("message"));
                                 toast.setView(view);
                                 int gravity = Gravity.BOTTOM;
-                                toast.setGravity(gravity, 10, 10);
+                                toast.setGravity(gravity, 90, 90);
                                 toast.show();
 
                             }
@@ -721,11 +762,13 @@ public class HomeActivity extends AppCompatActivity
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        operationRunning.setRunning(false);
+                        progressBarContainerMore.setVisibility(View.GONE);
                         Toast toast = new Toast(getApplicationContext());
                         View view = getLayoutInflater().inflate(R.layout.network_error, null);
                         toast.setView(view);
                         int gravity = Gravity.BOTTOM;
-                        toast.setGravity(gravity, 10, 10);
+                        toast.setGravity(gravity, 90, 90);
                         toast.show();
                     }
                 }

@@ -65,7 +65,57 @@ public class RegisterActivity extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        registerUser();
+                        final String username = editTextUsername.getText().toString().trim();
+                        final String email = editTextEmail.getText().toString().trim();
+                        final String phone = editTextPhone.getText().toString().trim();
+                        final String password = editTextPassword.getText().toString().trim();
+                        final String confirmPassword = editTextConfirmPassword.getText().toString().trim();
+                        if (username.length() == 0 || email.length() == 0 || phone.length() == 0 ||
+                                password.length() == 0 || confirmPassword.length() == 0) {
+                            Toast toast = new Toast(getApplicationContext());
+                            View view1 = getLayoutInflater().inflate(R.layout.empty_field, null);
+                            toast.setView(view1);
+                            toast.setDuration(Toast.LENGTH_LONG);
+                            int gravity = Gravity.BOTTOM;
+
+                            toast.setGravity(gravity, 10, 10);
+                            toast.show();
+                        } else if (password.length() < 8) {
+                            Toast toast = new Toast(getApplicationContext());
+                            View view1 = getLayoutInflater().inflate(R.layout.warning, null);
+                            TextView textView = view1.findViewById(R.id.message);
+                            textView.setText(R.string.short_password);
+                            toast.setView(view1);
+                            toast.setDuration(Toast.LENGTH_LONG);
+                            int gravity = Gravity.BOTTOM;
+
+                            toast.setGravity(gravity, 10, 10);
+                            toast.show();
+                        } else if (!password.equals(confirmPassword)) {
+                            Toast toast = new Toast(getApplicationContext());
+                            View view1 = getLayoutInflater().inflate(R.layout.warning, null);
+                            TextView textView = view1.findViewById(R.id.message);
+                            textView.setText(R.string.password_mismatch);
+                            toast.setView(view1);
+                            toast.setDuration(Toast.LENGTH_LONG);
+                            int gravity = Gravity.BOTTOM;
+
+                            toast.setGravity(gravity, 10, 10);
+                            toast.show();
+                        } else if (!Helpers.isValidEmail(email)) {
+                            Toast toast = new Toast(getApplicationContext());
+                            View view1 = getLayoutInflater().inflate(R.layout.warning, null);
+                            TextView textView = view1.findViewById(R.id.message);
+                            textView.setText(R.string.invalid_email);
+                            toast.setView(view1);
+                            toast.setDuration(Toast.LENGTH_LONG);
+                            int gravity = Gravity.BOTTOM;
+
+                            toast.setGravity(gravity, 10, 10);
+                            toast.show();
+                        } else {
+                            registerUser();
+                        }
                     }
                 }
         );
@@ -110,7 +160,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 Toast toast = new Toast(getApplicationContext());
                                 View view = getLayoutInflater().inflate(R.layout.warning, null);
                                 TextView textView = view.findViewById(R.id.message);
-                                textView.setText(R.string.no_file);
+                                textView.setText(jsonObject.getString("message"));
                                 toast.setView(view);
                                 int gravity = Gravity.BOTTOM;
                                 toast.setGravity(gravity, 10, 10);
@@ -118,7 +168,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                             }
                         } catch (JSONException e) {
-                            e.printStackTrace();
+//                            e.printStackTrace();
                         }
 
                     }
@@ -129,9 +179,7 @@ public class RegisterActivity extends AppCompatActivity {
                         progressBarContainer.setVisibility(View.GONE);
                         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                         Toast toast = new Toast(getApplicationContext());
-                        View view = getLayoutInflater().inflate(R.layout.warning, null);
-                        TextView textView = view.findViewById(R.id.message);
-                        textView.setText(R.string.network_error);
+                        View view = getLayoutInflater().inflate(R.layout.network_error, null);
                         toast.setView(view);
                         int gravity = Gravity.BOTTOM;
                         toast.setGravity(gravity, 10, 10);

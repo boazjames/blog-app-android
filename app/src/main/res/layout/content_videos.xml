@@ -20,6 +20,13 @@
         android:padding="5dp"
         android:layout_marginBottom="70dp"/>
 
+        <include layout="@layout/progress_bar_more"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:layout_below="@+id/recycler_view_videos"
+            android:layout_marginTop="-90dp"
+            android:layout_marginBottom="90dp"/>
+
     <Button
         android:id="@+id/showMoreVideosButton"
         android:layout_width="match_parent"
@@ -31,7 +38,8 @@
         android:background="@drawable/button_show_more"
         android:text="@string/show_more_videos_text"
         android:textColor="@color/colorPrimary"
-        android:layout_below="@id/recycler_view_videos"/>
+        android:layout_below="@id/recycler_view_videos"
+        android:visibility="gone"/>
 
         <Button
             android:id="@+id/showMoreSearchVideosButton"
@@ -53,7 +61,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/white"
-        android:visibility="visible">
+        android:visibility="gone">
         <ImageView
             android:id="@id/imageView"
             android:layout_width="100dp"

@@ -2,7 +2,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#33000000"
+    android:background="@color/seafoam"
     android:padding="10dp">
 
     <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -17,9 +17,9 @@
         app:civ_border_width="2dp" />
     <RelativeLayout
         android:id="@+id/relativeLayout1"
+        android:layout_centerHorizontal="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="100dp"
         android:layout_below="@+id/profilePhoto"
         android:layout_marginBottom="20dp">
         <TextView
@@ -28,7 +28,8 @@
             android:layout_height="wrap_content"
             android:text="@string/username_label"
             android:textStyle="bold"
-            android:drawableLeft="@drawable/baseline_perm_identity_black_24dp"/>
+            android:drawableLeft="@drawable/baseline_perm_identity_black_24dp"
+            android:drawableStart="@drawable/baseline_perm_identity_black_24dp" />
 
         <TextView
             android:id="@+id/profileUsername"
@@ -38,15 +39,16 @@
             android:layout_alignTop="@+id/usernameLabel"
             android:layout_toEndOf="@+id/usernameLabel"
             android:layout_toRightOf="@+id/usernameLabel"
-            android:text="TextView" />
+            android:text="TextView"
+            android:layout_marginStart="1dp" />
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/relativeLayout2"
+        android:layout_centerHorizontal="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/relativeLayout1"
-        android:layout_marginLeft="100dp"
         android:layout_marginBottom="20dp">
         <TextView
             android:id="@+id/emailLabel"
@@ -54,13 +56,13 @@
             android:layout_height="wrap_content"
             android:text="@string/email_label"
             android:textStyle="bold"
-            android:drawableLeft="@drawable/ic_email_black_24dp"/>
+            android:drawableLeft="@drawable/ic_email_black_24dp"
+            android:drawableStart="@drawable/ic_email_black_24dp" />
 
         <TextView
             android:id="@+id/profileEmail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="1dp"
             android:layout_alignTop="@+id/emailLabel"
             android:layout_toEndOf="@+id/emailLabel"
             android:layout_toRightOf="@+id/emailLabel"
@@ -69,10 +71,10 @@
 
     <RelativeLayout
         android:id="@+id/relativeLayout3"
+        android:layout_centerHorizontal="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/relativeLayout2"
-        android:layout_marginLeft="100dp"
         android:layout_marginBottom="20dp">
         <TextView
             android:id="@+id/phoneLabel"
@@ -80,13 +82,13 @@
             android:layout_height="wrap_content"
             android:text="@string/phone_label"
             android:textStyle="bold"
-            android:drawableLeft="@drawable/ic_call_black_24dp"/>
+            android:drawableLeft="@drawable/ic_call_black_24dp"
+            android:drawableStart="@drawable/ic_call_black_24dp" />
 
         <TextView
             android:id="@+id/profilePhone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="1dp"
             android:layout_alignTop="@+id/phoneLabel"
             android:layout_toEndOf="@+id/phoneLabel"
             android:layout_toRightOf="@+id/phoneLabel"

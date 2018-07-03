@@ -9,6 +9,7 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -64,7 +65,9 @@ public class VideosActivity extends AppCompatActivity
     private String userImgLink;
     private StoreSearchTerm storeSearchTerm;
     private RelativeLayout recycleViewContainer;
-    private RelativeLayout progressBarContainer, fetchErrorContainer;
+    private RelativeLayout progressBarContainer, fetchErrorContainer, progressBarContainerMore;
+    private NestedScrollView nestedScrollView;
+    private OperationRunning operationRunning;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,8 +75,13 @@ public class VideosActivity extends AppCompatActivity
         setContentView(R.layout.activity_videos);
 
         limit = "5";
+        storeSearchTerm = new StoreSearchTerm(null);
+        operationRunning = new OperationRunning(false);
 
         progressBarContainer = (RelativeLayout) findViewById(R.id.progress_bar_container);
+        progressBarContainerMore = findViewById(R.id.progress_bar_container_more);
+        nestedScrollView = findViewById(R.id.nestedScrollView);
+        progressBarContainerMore.setVisibility(View.GONE);
         progressBarContainer.setVisibility(View.GONE);
 
         progressDialog = new ProgressDialog(this);
@@ -124,7 +132,7 @@ public class VideosActivity extends AppCompatActivity
 
         navigation.getMenu().getItem(1).setChecked(true);
 
-        showMoreVideosButton.setOnClickListener(
+        /*showMoreVideosButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -140,19 +148,35 @@ public class VideosActivity extends AppCompatActivity
                         showMoreSearchVideos(storeSearchTerm.getSearchTerm(), storeNextStart.getStart());
                     }
                 }
-        );
+        );*/
 
         refresh.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         finish();
-                        overridePendingTransition( 0, 0);
+                        overridePendingTransition(0, 0);
                         startActivity(getIntent());
-                        overridePendingTransition( 0, 0);
+                        overridePendingTransition(0, 0);
                     }
                 }
         );
+
+        nestedScrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                if (!operationRunning.getRunning()) {
+
+                    if (scrollY == (v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight())) {
+                        if (storeSearchTerm.getSearchTerm() == null) {
+                            showMoreVideos(storeNextStart.getStart());
+                        } else {
+                            showMoreSearchVideos(storeSearchTerm.getSearchTerm(), storeNextStart.getStart());
+                        }
+                    }
+                }
+            }
+        });
 
     }
 
@@ -191,11 +215,17 @@ public class VideosActivity extends AppCompatActivity
             public boolean onQueryTextSubmit(String query) {
                 String searchTerm = searchView.getQuery().toString();
                 if (searchTerm.length() < 3) {
-                    Toast.makeText(getApplicationContext(), "Please enter at least 3 characters",
-                            Toast.LENGTH_LONG).show();
+                    Toast toast = new Toast(getApplicationContext());
+                    View view = getLayoutInflater().inflate(R.layout.warning, null);
+                    TextView textView = view.findViewById(R.id.message);
+                    textView.setText(R.string.less_characters);
+                    toast.setView(view);
+                    int gravity = Gravity.BOTTOM;
+                    toast.setGravity(gravity, 90, 90);
+                    toast.show();
                 } else {
                     searchFewVideos(searchTerm);
-                    storeSearchTerm = new StoreSearchTerm(searchTerm);
+                    storeSearchTerm.setSearchTerm(searchTerm);
                 }
                 return false;
             }
@@ -343,9 +373,9 @@ public class VideosActivity extends AppCompatActivity
                                     JSONObject data = jsonObject.getJSONObject("data");
                                     Iterator<?> keys = data.keys();
 
-                                    if (total < 6) {
+                                   /* if (total < 6) {
                                         showMoreVideosButton.setVisibility(View.GONE);
-                                    }
+                                    }*/
 
                                     while (keys.hasNext()) {
                                         String key = (String) keys.next();
@@ -394,22 +424,25 @@ public class VideosActivity extends AppCompatActivity
     }
 
     public void showMoreVideos(int start) {
+        operationRunning.setRunning(true);
+        progressBarContainerMore.setVisibility(View.VISIBLE);
         StringRequest stringRequest = new StringRequest(
                 Request.Method.GET,
                 Constants.URL_SHOW_VIDEOS + "?limit=" + limit + "&start=" + start,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-
+                        operationRunning.setRunning(false);
+                        progressBarContainerMore.setVisibility(View.GONE);
                         try {
                             JSONObject jsonObject = new JSONObject(response);
 
                             if (!jsonObject.getBoolean("error")) {
                                 storeNextStart.setStart(jsonObject.getInt("next_start"));
 
-                                if (storeNextStart.getStart() >= jsonObject.getInt("total")) {
+                                /*if (storeNextStart.getStart() >= jsonObject.getInt("total")) {
                                     showMoreVideosButton.setVisibility(View.GONE);
-                                }
+                                }*/
 
                                 total = jsonObject.getInt("total");
                                 JSONObject data = jsonObject.getJSONObject("data");
@@ -417,9 +450,9 @@ public class VideosActivity extends AppCompatActivity
 
                                 List<Video> videoListNew = new ArrayList<>();
 
-                                if (total < 6) {
+                                /*if (total < 6) {
                                     showMoreVideosButton.setVisibility(View.GONE);
-                                }
+                                }*/
 
                                 while (keys.hasNext()) {
                                     String key = (String) keys.next();
@@ -454,7 +487,7 @@ public class VideosActivity extends AppCompatActivity
                                 textView.setText(jsonObject.getString("message"));
                                 toast.setView(view);
                                 int gravity = Gravity.BOTTOM;
-                                toast.setGravity(gravity, 10, 10);
+                                toast.setGravity(gravity, 90, 90);
                                 toast.show();
                             }
                         } catch (JSONException e) {
@@ -465,11 +498,13 @@ public class VideosActivity extends AppCompatActivity
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        operationRunning.setRunning(false);
+                        progressBarContainerMore.setVisibility(View.GONE);
                         Toast toast = new Toast(getApplicationContext());
                         View view = getLayoutInflater().inflate(R.layout.network_error, null);
                         toast.setView(view);
                         int gravity = Gravity.BOTTOM;
-                        toast.setGravity(gravity, 10, 10);
+                        toast.setGravity(gravity, 90, 90);
                         toast.show();
                     }
                 }
@@ -511,9 +546,9 @@ public class VideosActivity extends AppCompatActivity
                                     JSONObject data = jsonObject.getJSONObject("data");
                                     Iterator<?> keys = data.keys();
 
-                                    if (total < 6) {
+                                    /*if (total < 6) {
                                         showMoreSearchVideosButton.setVisibility(View.GONE);
-                                    }
+                                    }*/
 
                                     while (keys.hasNext()) {
                                         String key = (String) keys.next();
@@ -551,7 +586,7 @@ public class VideosActivity extends AppCompatActivity
                                 textView.setText(jsonObject.getString("message"));
                                 toast.setView(view);
                                 int gravity = Gravity.BOTTOM;
-                                toast.setGravity(gravity, 10, 10);
+                                toast.setGravity(gravity, 90, 90);
                                 toast.show();
                             }
                         } catch (JSONException e) {
@@ -568,7 +603,7 @@ public class VideosActivity extends AppCompatActivity
                         View view = getLayoutInflater().inflate(R.layout.network_error, null);
                         toast.setView(view);
                         int gravity = Gravity.BOTTOM;
-                        toast.setGravity(gravity, 10, 10);
+                        toast.setGravity(gravity, 90, 90);
                         toast.show();
                     }
                 }
@@ -578,22 +613,25 @@ public class VideosActivity extends AppCompatActivity
     }
 
     public void showMoreSearchVideos(String search_term, int start) {
+        operationRunning.setRunning(true);
+        progressBarContainerMore.setVisibility(View.VISIBLE);
         StringRequest stringRequest = new StringRequest(
                 Request.Method.GET,
                 Constants.URL_SEARCH_VIDEOS + "?limit=" + limit + "&start=" + start + "&search_term=" + search_term,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-
+                        operationRunning.setRunning(false);
+                        progressBarContainerMore.setVisibility(View.GONE);
                         try {
                             JSONObject jsonObject = new JSONObject(response);
 
                             if (!jsonObject.getBoolean("error")) {
                                 storeNextStart.setStart(jsonObject.getInt("next_start"));
 
-                                if (storeNextStart.getStart() >= jsonObject.getInt("total")) {
+                                /*if (storeNextStart.getStart() >= jsonObject.getInt("total")) {
                                     showMoreSearchVideosButton.setVisibility(View.GONE);
-                                }
+                                }*/
 
                                 total = jsonObject.getInt("total");
                                 JSONObject data = jsonObject.getJSONObject("data");
@@ -601,9 +639,9 @@ public class VideosActivity extends AppCompatActivity
 
                                 List<Video> videoListNew = new ArrayList<>();
 
-                                if (total < 6) {
+                                /*if (total < 6) {
                                     showMoreSearchVideosButton.setVisibility(View.GONE);
-                                }
+                                }*/
 
                                 while (keys.hasNext()) {
                                     String key = (String) keys.next();
@@ -638,7 +676,7 @@ public class VideosActivity extends AppCompatActivity
                                 textView.setText(jsonObject.getString("message"));
                                 toast.setView(view);
                                 int gravity = Gravity.BOTTOM;
-                                toast.setGravity(gravity, 10, 10);
+                                toast.setGravity(gravity, 90, 90);
                                 toast.show();
 
                             }
@@ -650,8 +688,13 @@ public class VideosActivity extends AppCompatActivity
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(),
-                                getString(R.string.network_error), Toast.LENGTH_LONG).show();
+                        operationRunning.setRunning(false);
+                        progressBarContainerMore.setVisibility(View.GONE);
+                        Toast toast = new Toast(getApplicationContext());
+                        View view = getLayoutInflater().inflate(R.layout.network_error, null);
+                        toast.setView(view);
+                        toast.setGravity(Gravity.BOTTOM, 90, 90);
+                        toast.show();
                     }
                 }
         );

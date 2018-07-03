@@ -65,7 +65,6 @@ public class MemeActivity extends AppCompatActivity implements
     private String userImgLink, path;
     private List<String> links = new ArrayList<>();
     private StoreStart storeStart;
-    private Boolean fullScreen = false;
     private MenuItem menuItem;
     private DownloadManager downloadManager;
 
@@ -121,7 +120,6 @@ public class MemeActivity extends AppCompatActivity implements
                                         + 1))
                                 .placeholder(R.drawable.meme_placeholder)
                                 .error(R.drawable.meme_placeholder)
-                                .fit()
                                 .into(memeImage);
                         storeStart.setStart(storeStart.getStart() + 1);
                     } else {
@@ -144,7 +142,6 @@ public class MemeActivity extends AppCompatActivity implements
                                         - 1))
                                 .placeholder(R.drawable.meme_placeholder)
                                 .error(R.drawable.meme_placeholder)
-                                .fit()
                                 .into(memeImage);
                         storeStart.setStart(storeStart.getStart() - 1);
                     } else {
@@ -364,7 +361,6 @@ public class MemeActivity extends AppCompatActivity implements
                                         .load(Constants.MEME_URL + links.get(0))
                                         .placeholder(R.drawable.meme_placeholder)
                                         .error(R.drawable.meme_placeholder)
-                                        .fit()
                                         .into(memeImage);
                                 menuItem.setEnabled(true);
                             } else {

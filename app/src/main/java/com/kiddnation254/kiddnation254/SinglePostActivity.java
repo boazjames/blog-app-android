@@ -348,7 +348,8 @@ public class SinglePostActivity extends AppCompatActivity {
                                 if (!jsonObject.getBoolean("noData")) {
                                     storeNextStart = new StoreNextStart(jsonObject.getInt("next_start"));
                                     totalComments = jsonObject.getInt("total");
-                                    commentHeading.setText("(" + totalComments + ")Comments");
+                                    String commentCount = "(" + totalComments + ")Comments";
+                                    commentHeading.setText(commentCount);
 
                                     if (totalComments < 5) {
                                         commentsAllButton.setVisibility(View.GONE);
@@ -421,8 +422,6 @@ public class SinglePostActivity extends AppCompatActivity {
                                 showFewComments(postId, limit);
                                 editTextComment.setText("");
                                 editTextComment.clearFocus();
-
-                                Toast.makeText(getApplicationContext(), jsonObject.getString("message"), Toast.LENGTH_LONG).show();
 
                             } else {
                                 Toast toast = new Toast(getApplicationContext());

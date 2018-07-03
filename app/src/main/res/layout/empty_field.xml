@@ -18,6 +18,6 @@
         android:textColor="@android:color/white"
         android:textSize="16sp"
         android:text="@string/empty_field"
-        android:background="@drawable/toast_bg"
+        android:background="@drawable/toast_bg_warning"
         android:layout_centerHorizontal="true"/>
 </RelativeLayout>
