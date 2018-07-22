@@ -2,6 +2,7 @@ package com.kiddnation254.kiddnation254;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.app.SearchManager;
 import android.content.Context;
@@ -15,6 +16,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
@@ -45,6 +47,12 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -169,6 +177,8 @@ public class MemeActivity extends AppCompatActivity implements
                     }
                 }
         );
+
+
     }
 
     @Override
@@ -196,32 +206,36 @@ public class MemeActivity extends AppCompatActivity implements
         int id = item.getItemId();
 
         if (id == R.id.action_download) {
-            if (EasyPermissions.hasPermissions(getApplicationContext(), Manifest.permission
-                    .WRITE_EXTERNAL_STORAGE)) {
-                try {
-                    Uri uri = Uri.parse(Constants.MEME_URL + links.get(storeStart.getStart()));
-                    DownloadManager.Request request = new DownloadManager.Request(uri);
+            Dexter.withActivity(this)
+                    .withPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    .withListener(new PermissionListener() {
+                        @Override
+                        public void onPermissionGranted(PermissionGrantedResponse response) {
+                            downloadImage();
+                        }
 
-                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
-                            "KiddNation254_" + System.currentTimeMillis());
+                        @Override
+                        public void onPermissionDenied(PermissionDeniedResponse response) {
+                            if (response.isPermanentlyDenied()) {
+                                showSettingsDialog();
+                            } else {
+                                Toast toast = new Toast(getApplicationContext());
+                                View view = getLayoutInflater().inflate(R.layout.warning, null);
+                                TextView textView = view.findViewById(R.id.message);
+                                textView.setText(R.string.permission_denied);
+                                toast.setView(view);
+                                int gravity = Gravity.BOTTOM;
+                                toast.setGravity(gravity, 90, 90);
+                                toast.show();
+                            }
+                        }
 
-                    request.setNotificationVisibility(DownloadManager.Request
-                            .VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                    Long reference = downloadManager.enqueue(request);
-                } catch (IllegalStateException e) {
-                    Toast toast = new Toast(getApplicationContext());
-                    View view = getLayoutInflater().inflate(R.layout.message, null);
-                    TextView textView = view.findViewById(R.id.message);
-                    textView.setText(R.string.permission_denied);
-                    toast.setView(view);
-                    toast.setGravity(Gravity.BOTTOM, 30, 30);
-                    toast.show();
-                }
-            } else {
-                //If permission is not present request for the same.
-                EasyPermissions.requestPermissions(getApplicationContext(),
-                        getString(R.string.save_file), 300, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            }
+                        @Override
+                        public void onPermissionRationaleShouldBeShown(PermissionRequest permission,
+                                                                       PermissionToken token) {
+                            token.continuePermissionRequest();
+                        }
+                    }).check();
 
         }
 
@@ -388,5 +402,65 @@ public class MemeActivity extends AppCompatActivity implements
                 }
         );
         RequestHandler.getInstance(getApplicationContext()).addToRequestQueue(stringRequest);
+    }
+
+    private void showSettingsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.MyDialogTheme);
+        builder.setTitle("Need Permissions");
+        builder.setMessage("This app needs permission to use this feature." +
+                " You can grant them in app settings under permissions.");
+        builder.setPositiveButton("GO TO SETTINGS", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+                openSettings();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
+
+    private void openSettings() {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getPackageName(), null);
+        intent.setData(uri);
+        startActivityForResult(intent, 101);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == Activity.RESULT_OK) {
+            if(requestCode == 101) {
+                downloadImage();
+            }
+        }
+    }
+
+    private void downloadImage () {
+        try {
+            Uri uri = Uri.parse(Constants.MEME_URL + links.get(storeStart.getStart()));
+            DownloadManager.Request request = new DownloadManager.Request(uri);
+
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
+                    "KiddNation254_" + System.currentTimeMillis());
+
+            request.setNotificationVisibility(DownloadManager.Request
+                    .VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            Long reference = downloadManager.enqueue(request);
+        } catch (IllegalStateException e) {
+            Toast toast = new Toast(getApplicationContext());
+            View view = getLayoutInflater().inflate(R.layout.message, null);
+            TextView textView = view.findViewById(R.id.message);
+            textView.setText(R.string.permission_denied);
+            toast.setView(view);
+            toast.setGravity(Gravity.BOTTOM, 30, 30);
+            toast.show();
+        }
     }
 }

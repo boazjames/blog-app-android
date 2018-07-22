@@ -74,6 +74,7 @@ public class HomeActivity extends AppCompatActivity
     private RelativeLayout progressBarContainer, fetch_error, progressBarContainerMore;
     private NestedScrollView nestedScrollView;
     private OperationRunning operationRunning;
+    private StoreTotal storeTotal;
 
 
     @Override
@@ -84,6 +85,8 @@ public class HomeActivity extends AppCompatActivity
         limit = "5";
         storeSearchTerm = new StoreSearchTerm(null);
         operationRunning = new OperationRunning(false);
+        storeTotal = new StoreTotal(0);
+        storeNextStart = new StoreNextStart(0);
 
         progressBarContainer = (RelativeLayout) findViewById(R.id.progress_bar_container);
         progressBarContainerMore = (RelativeLayout) findViewById(R.id.progress_bar_container_more);
@@ -188,9 +191,11 @@ public class HomeActivity extends AppCompatActivity
 
                     if (scrollY == (v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight())) {
                         if (storeSearchTerm.getSearchTerm() == null) {
-                            showMorePosts(storeNextStart.getStart());
+                            if (storeNextStart.getStart() <= storeTotal.getTotal())
+                                showMorePosts(storeNextStart.getStart());
                         } else {
-                            searchMorePosts(storeSearchTerm.getSearchTerm(), storeNextStart.getStart());
+                            if (storeNextStart.getStart() <= storeTotal.getTotal())
+                                searchMorePosts(storeSearchTerm.getSearchTerm(), storeNextStart.getStart());
                         }
                     }
                 }
@@ -388,8 +393,8 @@ public class HomeActivity extends AppCompatActivity
 
                             if (!jsonObject.getBoolean("error")) {
                                 if (!jsonObject.getBoolean("noData")) {
-                                    storeNextStart = new StoreNextStart(jsonObject.getInt("next_start"));
-                                    total = jsonObject.getInt("total");
+                                    storeNextStart.setStart(jsonObject.getInt("next_start"));
+                                    storeTotal.setTotal(jsonObject.getInt("total"));
                                     JSONObject data = jsonObject.getJSONObject("data");
                                     Iterator<?> keys = data.keys();
 
@@ -479,6 +484,7 @@ public class HomeActivity extends AppCompatActivity
                                 }*/
 
                                 total = jsonObject.getInt("total");
+                                storeTotal.setTotal(jsonObject.getInt("total"));
                                 JSONObject data = jsonObject.getJSONObject("data");
                                 Iterator<?> keys = data.keys();
 
@@ -589,8 +595,9 @@ public class HomeActivity extends AppCompatActivity
                                     adapter.notifyDataSetChanged();
 
                                     recycleViewContainer.setVisibility(View.VISIBLE);
-                                    storeNextStart = new StoreNextStart(jsonObject.getInt("next_start"));
+                                    storeNextStart.setStart(jsonObject.getInt("next_start"));
                                     total = jsonObject.getInt("total");
+                                    storeTotal.setTotal(jsonObject.getInt("total"));
                                     JSONObject data = jsonObject.getJSONObject("data");
                                     Iterator<?> keys = data.keys();
 
@@ -705,6 +712,7 @@ public class HomeActivity extends AppCompatActivity
                                 }*/
 
                                 total = jsonObject.getInt("total");
+                                storeTotal.setTotal(jsonObject.getInt("total"));
                                 JSONObject data = jsonObject.getJSONObject("data");
                                 Iterator<?> keys = data.keys();
 

@@ -68,6 +68,7 @@ public class VideosActivity extends AppCompatActivity
     private RelativeLayout progressBarContainer, fetchErrorContainer, progressBarContainerMore;
     private NestedScrollView nestedScrollView;
     private OperationRunning operationRunning;
+    private StoreTotal storeTotal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +78,7 @@ public class VideosActivity extends AppCompatActivity
         limit = "5";
         storeSearchTerm = new StoreSearchTerm(null);
         operationRunning = new OperationRunning(false);
+        storeTotal = new StoreTotal(0);
 
         progressBarContainer = (RelativeLayout) findViewById(R.id.progress_bar_container);
         progressBarContainerMore = findViewById(R.id.progress_bar_container_more);
@@ -169,9 +171,11 @@ public class VideosActivity extends AppCompatActivity
 
                     if (scrollY == (v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight())) {
                         if (storeSearchTerm.getSearchTerm() == null) {
-                            showMoreVideos(storeNextStart.getStart());
+                            if (storeNextStart.getStart() <= storeTotal.getTotal())
+                                showMoreVideos(storeNextStart.getStart());
                         } else {
-                            showMoreSearchVideos(storeSearchTerm.getSearchTerm(), storeNextStart.getStart());
+                            if (storeNextStart.getStart() <= storeTotal.getTotal())
+                                showMoreSearchVideos(storeSearchTerm.getSearchTerm(), storeNextStart.getStart());
                         }
                     }
                 }
@@ -370,6 +374,7 @@ public class VideosActivity extends AppCompatActivity
                                 if (!jsonObject.getBoolean("noData")) {
                                     storeNextStart = new StoreNextStart(jsonObject.getInt("next_start"));
                                     total = jsonObject.getInt("total");
+                                    storeTotal.setTotal(jsonObject.getInt("total"));
                                     JSONObject data = jsonObject.getJSONObject("data");
                                     Iterator<?> keys = data.keys();
 
@@ -445,6 +450,7 @@ public class VideosActivity extends AppCompatActivity
                                 }*/
 
                                 total = jsonObject.getInt("total");
+                                storeTotal.setTotal(jsonObject.getInt("total"));
                                 JSONObject data = jsonObject.getJSONObject("data");
                                 Iterator<?> keys = data.keys();
 
@@ -543,6 +549,7 @@ public class VideosActivity extends AppCompatActivity
                                     showMoreSearchVideosButton.setVisibility(View.VISIBLE);
                                     storeNextStart = new StoreNextStart(jsonObject.getInt("next_start"));
                                     total = jsonObject.getInt("total");
+                                    storeTotal.setTotal(jsonObject.getInt("total"));
                                     JSONObject data = jsonObject.getJSONObject("data");
                                     Iterator<?> keys = data.keys();
 
@@ -634,6 +641,7 @@ public class VideosActivity extends AppCompatActivity
                                 }*/
 
                                 total = jsonObject.getInt("total");
+                                storeTotal.setTotal(jsonObject.getInt("total"));
                                 JSONObject data = jsonObject.getJSONObject("data");
                                 Iterator<?> keys = data.keys();
 

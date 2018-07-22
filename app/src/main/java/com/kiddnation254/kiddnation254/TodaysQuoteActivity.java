@@ -273,7 +273,7 @@ public class TodaysQuoteActivity extends AppCompatActivity
                                 textView.setText(jsonObject.getString("message"));
                                 toast.setView(view);
                                 int gravity = Gravity.BOTTOM;
-                                toast.setGravity(gravity, 10, 10);
+                                toast.setGravity(gravity, 90, 90);
                                 toast.show();
                             }
                         } catch (JSONException e) {

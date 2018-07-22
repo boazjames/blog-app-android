@@ -10,11 +10,13 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +26,16 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.karumi.dexter.listener.single.PermissionListener;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.List;
@@ -38,8 +50,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 
-public class ChangeProfilePhotoActivity extends AppCompatActivity implements
-        EasyPermissions.PermissionCallbacks {
+public class ChangeProfilePhotoActivity extends AppCompatActivity {
     ImageView image;
     Button choose, upload;
     String userId;
@@ -76,19 +87,59 @@ public class ChangeProfilePhotoActivity extends AppCompatActivity implements
         choose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_PICK);
-                startActivityForResult(Intent.createChooser(intent, "Select Image"), PICK_IMAGE_REQUEST);*/
 
                 //check if app has permission to access the external storage.
-                if (EasyPermissions.hasPermissions(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                    showPictureDialog();
+                Dexter.withActivity(ChangeProfilePhotoActivity.this)
+                        .withPermissions(Manifest.permission.READ_EXTERNAL_STORAGE,
+                                Manifest.permission.CAMERA)
+                        .withListener(new MultiplePermissionsListener() {
+                            @Override
+                            public void onPermissionsChecked(MultiplePermissionsReport report) {
+                                if(!report.getDeniedPermissionResponses().isEmpty()) {
+                                    Log.i("TAG", "permissions not empty");
+                                }
+                                if(report.areAllPermissionsGranted()) {
+                                    showPictureDialog();
+                                } else {
+                                    showSettingsDialog();
+                                }
+                            }
 
-                } else {
-                    //If permission is not present request for the same.
-                    EasyPermissions.requestPermissions(getApplicationContext(), getString(R.string.read_file), 300, Manifest.permission.READ_EXTERNAL_STORAGE);
-                }
+                            @Override
+                            public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                                token.continuePermissionRequest();
+                            }
+                        }).check();
+
+                        /*.withListener(new PermissionListener() {
+                            @Override
+                            public void onPermissionGranted(PermissionGrantedResponse response) {
+                                showPictureDialog();
+                            }
+
+                            @Override
+                            public void onPermissionDenied(PermissionDeniedResponse response) {
+                                if (response.isPermanentlyDenied()) {
+                                    showSettingsDialog();
+                                } else {
+                                    Toast toast = new Toast(getApplicationContext());
+                                    View view = getLayoutInflater().inflate(R.layout.warning, null);
+                                    TextView textView = view.findViewById(R.id.message);
+                                    textView.setText(R.string.permission_denied);
+                                    toast.setView(view);
+                                    int gravity = Gravity.BOTTOM;
+                                    toast.setGravity(gravity, 90, 90);
+                                    toast.show();
+                                }
+                            }
+
+                            @Override
+                            public void onPermissionRationaleShouldBeShown(PermissionRequest permission,
+                                                                           PermissionToken token) {
+                                token.continuePermissionRequest();
+                            }
+                        }).check();*/
+
             }
         });
 
@@ -149,25 +200,6 @@ public class ChangeProfilePhotoActivity extends AppCompatActivity implements
         }
     }
 
-    @Override
-    public void onPermissionsGranted(int requestCode, List<String> perms) {
-//        showFileChooserIntent();
-        showPictureDialog();
-    }
-
-    @Override
-    public void onPermissionsDenied(int requestCode, List<String> perms) {
-
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults,
-                ChangeProfilePhotoActivity.this);
-    }
-
     private void uploadPhoto() {
 
         //converting image to base64 string
@@ -196,29 +228,29 @@ public class ChangeProfilePhotoActivity extends AppCompatActivity implements
                 progressContainer.setVisibility(View.GONE);
                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
-                    if (!response.body().getError()) {
-                        Toast toast = new Toast(getApplicationContext());
-                        View view = getLayoutInflater().inflate(R.layout.message, null);
-                        TextView textView = view.findViewById(R.id.message);
-                        textView.setText(response.body().getMessage());
-                        toast.setView(view);
-                        int gravity = Gravity.BOTTOM;
-                        toast.setGravity(gravity, 10, 10);
-                        toast.show();
-                        SharedPrefManager.getInstance(getApplicationContext())
-                                .setUserImageLink(response.body().getUser_image());
-                        onBackPressed();
+                if (!response.body().getError()) {
+                    Toast toast = new Toast(getApplicationContext());
+                    View view = getLayoutInflater().inflate(R.layout.message, null);
+                    TextView textView = view.findViewById(R.id.message);
+                    textView.setText(response.body().getMessage());
+                    toast.setView(view);
+                    int gravity = Gravity.BOTTOM;
+                    toast.setGravity(gravity, 90, 90);
+                    toast.show();
+                    SharedPrefManager.getInstance(getApplicationContext())
+                            .setUserImageLink(response.body().getUser_image());
+                    onBackPressed();
 
-                    } else {
-                        Toast toast = new Toast(getApplicationContext());
-                        View view = getLayoutInflater().inflate(R.layout.warning, null);
-                        TextView textView = view.findViewById(R.id.message);
-                        textView.setText(response.body().getMessage());
-                        toast.setView(view);
-                        int gravity = Gravity.BOTTOM;
-                        toast.setGravity(gravity, 10, 10);
-                        toast.show();
-                    }
+                } else {
+                    Toast toast = new Toast(getApplicationContext());
+                    View view = getLayoutInflater().inflate(R.layout.warning, null);
+                    TextView textView = view.findViewById(R.id.message);
+                    textView.setText(response.body().getMessage());
+                    toast.setView(view);
+                    int gravity = Gravity.BOTTOM;
+                    toast.setGravity(gravity, 10, 10);
+                    toast.show();
+                }
             }
 
             @Override
@@ -244,7 +276,7 @@ public class ChangeProfilePhotoActivity extends AppCompatActivity implements
     }
 
     private void takePhotoFromCamera() {
-        Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE_SECURE);
         startActivityForResult(intent, CAMERA);
     }
 
@@ -295,5 +327,33 @@ public class ChangeProfilePhotoActivity extends AppCompatActivity implements
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
         String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
         return Uri.parse(path);
+    }
+
+    private void showSettingsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.MyDialogTheme);
+        builder.setTitle("Need Permissions");
+        builder.setMessage("This app needs permission to use this feature." +
+                " You can grant them in app settings under permissions.");
+        builder.setPositiveButton("GO TO SETTINGS", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+                openSettings();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
+
+    private void openSettings() {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getPackageName(), null);
+        intent.setData(uri);
+        startActivityForResult(intent, 101);
     }
 }
